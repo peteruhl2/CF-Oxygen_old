@@ -3,10 +3,11 @@
 # 12/14/2020
 
 # get to home directory
-cd("C:\\Users\\peter\\Onedrive\\Desktop\\cyst fib\\OxygenModels")
+cd(@__DIR__)
+
+# cd("C:\\Users\\peter\\Onedrive\\Desktop\\cyst fib\\OxygenModels")
 
 using Plots, DifferentialEquations
-using Statistics
 
 #=============================================================================#
 
@@ -76,12 +77,10 @@ p = [λ,μ,η,C_tot]
 ϵ = 0.5428/24
 t_treat = 24*28 # starts at 28 days
 
-
 # attack growth rate and common death rate
 dc = 0.7016/24
 df = 0.7016/24
 rf = 14.3436/24
-
 
 # results arrays (temp)
 C = []
@@ -92,26 +91,6 @@ ox = []
 # initial amounts of c and f
 c1 = ceil(0.8283*length(D[:,:,1]))
 f1 = ceil(0.0165*length(D[:,:,1]))
-
-# OLD =========================================================================#
-# #populate for f1
-# for i = 1:f1
-#     xdim = rand(1:n)
-#     ydim = rand(1:n)
-#     if D[xdim,ydim,1] == 0
-#         D[xdim,ydim,1] = 2
-#     end
-# end
-
-# # populate for c1
-# for i = 1:c1
-#     xdim = rand(1:n)
-#     ydim = rand(1:n)
-#     if D[xdim,ydim,1] == 0
-#         D[xdim,ydim,1] = 1
-#     end
-# end
-# END OLD =====================================================================#
 
 #populate for f1
 f0 = 0
@@ -135,20 +114,12 @@ while (c0 < c1)
     end
 end
 
-# # get actual initial c and f
-# c1 = 0; f1 = 0
-# for i=1:length(D[:,:,1])
-#     #count number of c
-#     if D[i] == 1 global c1 += 1 end
-#     #count number of f
-#     if D[i] == 2 global f1 += 1 end
-# end
-
 # first time results
 pop = c1 + f1
 append!(C,c1)
 append!(F,f1)
 append!(P,pop)
+append!(ox,w)
 
 t = 0
 # time loop
@@ -168,10 +139,7 @@ while (true)
         df = 0.7037/24 + ϵ
     end
 
-
-    # this will be stuff for the oxygen ode
-    u0 = w
-
+    ### this will be stuff for the oxygen ode
     # count c's for ode
     C_tot = 0
     for j = 1:length(D[:,:,1])
@@ -188,8 +156,6 @@ while (true)
     sol = solve(prob)
     w = sol.u[end]
 
-
-
     # agent based loop
     while samp < pop
         # take samples
@@ -200,7 +166,7 @@ while (true)
         if D[idim,jdim,1] == 1
             samp += 1 #increment sample
             rn = rand() # get random number
-            rc = get_rc(w)
+            rc = get_rc(w) # get oxygen dependent growth rate
 
             # division event for c
             if rn < rc
@@ -216,13 +182,12 @@ while (true)
             elseif rn < (rc + dc)
                 D[idim,jdim,1] = 0
             end
-        end #end if sampled spot is c
+        end # end if sampled spot is c
 
         # if sampled spot is f
         if D[idim,jdim,1] == 2
             samp += 1 # increment samp
-            rn = rand(); # get random number
-            # rf = get_rf(w)
+            rn = rand() # get random number
 
             # division event for f
             if rn < rf
@@ -252,11 +217,11 @@ while (true)
         if D[j] == 2 f += 1 end
     end
 
-    # # this does the movie
-    # if t%1 == 0
-    #     p = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
-    #     display(p)
-    # end
+    # this does the movie
+    if t%1 == 0
+        p = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
+        display(p)
+    end
 
     # update populations
     pop = c + f
@@ -277,7 +242,7 @@ p1 = plot!(24*sol.t,sol[1,:], label = "C ODE")
 p1 = plot!(24*sol.t,sol[2,:], label = "F ODE", legend=:left)
 p2 = plot(ox)
 p2 = plot!(24*sol.t,sol[3,:])
-p = plot(p1,p2,layout = (2,1),legend=false)
+p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (hours)")
 display(p)
 
 println(C[1], " ", F[1])
