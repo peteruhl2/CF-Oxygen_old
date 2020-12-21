@@ -135,14 +135,14 @@ while (c0 < c1)
     end
 end
 
-# get actual initial c and f
-c1 = 0; f1 = 0
-for i=1:length(D[:,:,1])
-    #count number of c
-    if D[i] == 1 global c1 += 1 end
-    #count number of f
-    if D[i] == 2 global f1 += 1 end
-end
+# # get actual initial c and f
+# c1 = 0; f1 = 0
+# for i=1:length(D[:,:,1])
+#     #count number of c
+#     if D[i] == 1 global c1 += 1 end
+#     #count number of f
+#     if D[i] == 2 global f1 += 1 end
+# end
 
 # first time results
 pop = c1 + f1
