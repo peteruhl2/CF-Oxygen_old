@@ -2,7 +2,7 @@
 # 'AB_avgs.csv'
 # 12/17/2020
 
-using CSV, Plots
+using CSV, Plots, DifferentialEquations
 
 cd("C:\\Users\\peter\\Onedrive\\Desktop\\cyst fib\\OxygenModels")
 
@@ -40,7 +40,6 @@ function cf_ode!(yp,y,p,t)
     yp[2] = rf*f*(1 - f - β*c) - d*f - ϵ*f
     yp[3] = λ - μ*w - η*k*c*w
 
-    # println(get_rc(x)," ", get_rf(x))
 end
 
 # ode parameters
