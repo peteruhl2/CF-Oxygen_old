@@ -77,24 +77,24 @@ end
 
 # size of domain and initial values
 w = 0.1388 # initial oxygen
-k = 40^2 # carrying capacity
+k = 60^2 # carrying capacity
 n = convert(Int64,floor(sqrt(k)))
 D = zeros(n,n,2)
 D[:,:,2] .= w
 
 # time stuff
 t = 0
-tmax = 500 #24*40
+tmax = Inf #24*40
 t_treat = 24*28
 
 # ode stuff
 λ = 0.22/24; μ = 1.4273/24; Cyn = 0.; neigh = 0; X = 0;
 # η = (0.8176/24)/n^2 # this might not be per capita for this model
 η = (0.8176/24)
-g = 1.0 # diffustion rate 
+g = 0.05 # diffustion rate
 
 fx(x,X) = λ - μ*x - η*Cyn*x - g*neigh*x + g*X
-step = 0.1 # as large as possible w/o blowing up the ode
+step = 0.05 # as large as possible w/o blowing up the ode
 
 # attack growth rate and common death rate
 dc = 0.7016/24
@@ -251,8 +251,8 @@ while (true)
     append!(P,pop)
     append!(ox,mean(D[:,:,2]))
 
-    # # end if one goes extint
-    # if c == 0 || f == 0 break end
+    # end if one goes extint
+    if c == 0 || f == 0 break end
 
 end # end timer
 end # end time loop
