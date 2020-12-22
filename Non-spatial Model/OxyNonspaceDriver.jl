@@ -31,6 +31,7 @@ function sim(num::Int64, movie::Bool=false)
     w = 0.1388
 
     # size of domain
+    k = 100
     n = convert(Int64,floor(sqrt(k)))
     D = zeros(n,n,2)
     D[:,:,2] .= w
