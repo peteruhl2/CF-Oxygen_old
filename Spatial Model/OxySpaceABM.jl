@@ -7,7 +7,7 @@
 # get to home directory
 cd(@__DIR__)
 
-using Plots
+using Plots, Statistics
 
 #=============================================================================#
 function birth_event!(D,i,j,n,bug)
@@ -77,7 +77,7 @@ end
 
 # size of domain and initial values
 w = 0.1388 # initial oxygen
-k = 60^2 # carrying capacity
+k = 25^2 # carrying capacity
 n = convert(Int64,floor(sqrt(k)))
 D = zeros(n,n,2)
 D[:,:,2] .= w
