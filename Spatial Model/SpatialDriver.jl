@@ -269,8 +269,8 @@ end # sim function
 function main()
     # model parameters
     g = 0.05
-    k = 40^2
-    runs = 200
+    k = 30^2
+    runs = 20
 
     # make director for simulations
     dir = "Sim, g = $g, k = $k"
