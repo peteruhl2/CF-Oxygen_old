@@ -252,8 +252,9 @@ function sim(num::Int64, g::Float64, k::Int64, movie::Bool=false)
         append!(P,pop)
         append!(ox,mean(D[:,:,2]))
 
+        new_w = mean(D[:,:,2])
         # write number to file
-        write(io, "$c $f $pop $w\n")
+        write(io, "$c,$f,$pop,$new_w\n")
 
         # end if one goes extint
         if c == 0 || f == 0 break end
@@ -268,12 +269,12 @@ end # sim function
 
 function main()
     # model parameters
-    g = 0.05
-    k = 30^2
-    runs = 20
+    g = 0.95
+    k = 40^2
+    runs = 50
 
     # make director for simulations
-    dir = "Sim, g = $g, k = $k"
+    dir = "Sim g = $g, k = $k"
 
     # go to simulation folder
     cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\Simulations")
