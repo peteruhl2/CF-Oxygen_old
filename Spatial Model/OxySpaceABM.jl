@@ -7,6 +7,9 @@
 # get to home directory
 cd(@__DIR__)
 
+# for making a gif for VII meeting
+cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\figs")
+
 using Plots, Statistics
 
 #=============================================================================#
@@ -77,14 +80,14 @@ end
 
 # size of domain and initial values
 w = 0.1388 # initial oxygen
-k = 25^2 # carrying capacity
+k = 40^2 # carrying capacity
 n = convert(Int64,floor(sqrt(k)))
 D = zeros(n,n,2)
 D[:,:,2] .= w
 
 # time stuff
 t = 0
-tmax = 50 #24*40
+tmax = Inf #24*40
 t_treat = 24*28
 
 # ode stuff
@@ -149,7 +152,7 @@ while (true)
     samp = 0; global pop; global t; global tmax
     t += 1
     if t > tmax break end
-    println("$t out of ",tmax)
+    # println("$t out of ",tmax)
 
     global step; t2 = 0
     while (t2*step <= 1) # will be ode loop
@@ -238,11 +241,25 @@ while (true)
         display(p)
     end
 
-    # # just to save figures
-    # if (t-1) % 10 == 0
-    #     println("$t")
-    #     savefig("patch$t.png")
-    # end
+    # just to save figures
+    # for a gif 1/13/21
+    if (t-1) % 100 == 0
+        if t < 10
+            println("00000$t")
+            savefig("patch00000$t.png")
+        elseif t < 100
+            println("0000$t")
+            savefig("patch0000$t.png")
+        elseif t < 1000
+            println("000$t")
+            savefig("patch000$t.png")
+        elseif t < 10000
+            println("00$t")
+            savefig("patch00$t.png")
+        end
+        # println("$t")
+        # savefig("patch$t.png")
+    end
 
     # update populations
     pop = c + f
