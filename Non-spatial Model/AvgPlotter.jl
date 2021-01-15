@@ -50,9 +50,10 @@ k = 10000
 
 p = [Ec,Ac,nc,rf,d,ϵ,μ,η,k]
 
-y0 = [0.8283,0.0165,0.1388]
+# y0 = [0.8283,0.0165,0.1388] # best fitting ode parameters
+y0 = [0.8789,0.0165,0.1388] 
 tspan = (0.0,40.0)
-prob = ODEProblem(cf_ode,y0,tspan,p)
+prob = ODEProblem(cf_ode!,y0,tspan,p)
 sol = solve(prob)
 
 #==============================================================================#
