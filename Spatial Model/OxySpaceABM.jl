@@ -7,8 +7,8 @@
 # get to home directory
 cd(@__DIR__)
 
-# for making a gif for VII meeting
-cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\figs")
+# # for making a gif for VII meeting
+# cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\figs")
 
 using Plots, Statistics
 
@@ -94,10 +94,10 @@ t_treat = 24*28
 λ = 0.22/24; μ = 1.4273/24; Cyn = 0.; neigh = 0; X = 0;
 # η = (0.8176/24)/n^2 # this might not be per capita for this model
 η = (0.8176/24)
-g = 0.05 # diffustion rate
+g = 10.05 # diffustion rate
 
 fx(x,X) = λ - μ*x - η*Cyn*x - g*neigh*x + g*X
-step = 0.05 # as large as possible w/o blowing up the ode
+step = 0.0005 # as large as possible w/o blowing up the ode
 
 # attack growth rate and common death rate
 dc = 0.7016/24
@@ -152,7 +152,7 @@ while (true)
     samp = 0; global pop; global t; global tmax
     t += 1
     if t > tmax break end
-    # println("$t out of ",tmax)
+    println("$t out of ",tmax)
 
     global step; t2 = 0
     while (t2*step <= 1) # will be ode loop
@@ -241,25 +241,25 @@ while (true)
         display(p)
     end
 
-    # just to save figures
-    # for a gif 1/13/21
-    if (t-1) % 100 == 0
-        if t < 10
-            println("00000$t")
-            savefig("patch00000$t.png")
-        elseif t < 100
-            println("0000$t")
-            savefig("patch0000$t.png")
-        elseif t < 1000
-            println("000$t")
-            savefig("patch000$t.png")
-        elseif t < 10000
-            println("00$t")
-            savefig("patch00$t.png")
-        end
-        # println("$t")
-        # savefig("patch$t.png")
-    end
+    # # just to save figures
+    # # for a gif 1/13/21
+    # if (t-1) % 100 == 0
+    #     if t < 10
+    #         println("00000$t")
+    #         savefig("patch00000$t.png")
+    #     elseif t < 100
+    #         println("0000$t")
+    #         savefig("patch0000$t.png")
+    #     elseif t < 1000
+    #         println("000$t")
+    #         savefig("patch000$t.png")
+    #     elseif t < 10000
+    #         println("00$t")
+    #         savefig("patch00$t.png")
+    #     end
+    #     # println("$t")
+    #     # savefig("patch$t.png")
+    # end
 
     # update populations
     pop = c + f

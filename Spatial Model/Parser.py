@@ -13,7 +13,7 @@ import pandas as pd
 
 # get to folder for a simulation
 path = r'C:\Users\peter\OneDrive\Documents\GitHub\CF-Oxygen\Spatial Model\Simulations'
-sim = r'Sim, g = 0.8, k = 1600'
+sim = r'Sim g = 0.75, k = 1600'
 path += '\\' + sim
 os.chdir(path)
 
@@ -42,7 +42,7 @@ for i in range(1,n_sims + 1):
     
     # set file name and read in as numpy array
     file_name = 'sim_' + n + '.csv'
-    sim = pd.read_csv(file_name, delimiter=' ', header=None)
+    sim = pd.read_csv(file_name, delimiter=',', header=None)
     sim = np.asarray(sim)
     
     # length of current run
@@ -59,16 +59,19 @@ for i in range(1,n_sims + 1):
 with open('AB_avgs.csv', 'w') as f:
     for i in range(len(C_avg)):
         # means
-        C_avg[i,0] = np.mean(C[i,:])
-        F_avg[i,0] = np.mean(F[i,:])
+        # C_avg[i,0] = np.mean(C[i,:])
+        # F_avg[i,0] = np.mean(F[i,:])
+        C_avg[i,0] = C[i,:][np.nonzero(C[i,:])].mean()
+        F_avg[i,0] = F[i,:][np.nonzero(F[i,:])].mean()
         
         # 2.5th percentiles 
-        C_25[i,0] = np.percentile(C[i,:],q = 2.5)
-        F_25[i,0] = np.percentile(F[i,:],q = 2.5)
+        C_25[i,0] = np.percentile(C[i,:][np.nonzero(C[i,:])], q = 2.5)
+        F_25[i,0] = np.percentile(F[i,:][np.nonzero(F[i,:])], q = 2.5)
         
         # 97.5th percentiles 
-        C_975[i,0] = np.percentile(C[i,:],q = 97.5)
-        F_975[i,0] = np.percentile(F[i,:],q = 97.5)
+        C_975[i,0] = np.percentile(C[i,:][np.nonzero(C[i,:])], q = 97.5)
+        F_975[i,0] = np.percentile(F[i,:][np.nonzero(F[i,:])], q = 97.5)
     
         # comment this if things don't work
-        f.write('%d,%d,%d,%d,%d,%d\n' % (C_25[i],C_avg[i],C_975[i],F_25[i],F_avg[i],F_975[i]))
+        # f.write('%d,%d,%d,%d,%d,%d\n' % (C_25[i],C_avg[i],C_975[i],F_25[i],F_avg[i],F_975[i]))
+        f.write('%f,%f,%f,%f,%f,%f\n' % (C_25[i],C_avg[i],C_975[i],F_25[i],F_avg[i],F_975[i]))

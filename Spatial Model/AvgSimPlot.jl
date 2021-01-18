@@ -21,7 +21,7 @@ end
 # get simulation data ==========================================================
 path = "C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\Simulations"
 G = ["0.0005","0.005","0.9","0.35","0.65","0.75","0.95","1.1","1.2","0.05","0.5","0.8"]
-g = G[10]
+g = G[12]
 # sim_dir = "\\" * "Sim g = 0.0005, k = 1600"
 sim_dir = "\\" * "Sim g = " * g * ", k = 1600"
 
@@ -42,7 +42,7 @@ f_975 = stuff[:,6]
 
 # plots here ===================================================================
 # mean series
-p = plot(c_avg, color = :blue, label = "C ABM Mean",lw = 2)
+p = plot!(c_avg, color = :blue, label = "C ABM Mean",lw = 2)
 p = plot!(f_avg, color = :red, label = "F ABM Mean",lw = 2, title = "g = $g")
 
 # # 95th percentiles
@@ -51,4 +51,5 @@ p = plot!(f_avg, color = :red, label = "F ABM Mean",lw = 2, title = "g = $g")
 # p = plot!(f_25, color = :red, label = "F ABM 95th percentile", lw = 0.5, linestyle = :dashdot)
 # p = plot!(f_975, color = :red, label = "",lw = 0.5, linestyle = :dashdot, legend=:right)
 p = vline!([MTimes[g]], label = "Mean extinction time")
+p = plot!(legend = false)
 display(p)
