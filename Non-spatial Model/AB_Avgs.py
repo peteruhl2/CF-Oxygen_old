@@ -6,10 +6,10 @@ Created on Thu Dec 17 08:55:47 2020
 """
 
 # import matplotlib.pyplot as plt
+# import seaborn as sns
 import numpy as np
 import os
 import pandas as pd
-# import seaborn as sns
 
 path = r'C:\Users\peter\OneDrive\Desktop\cyst fib\OxygenModels\Simulations'
 os.chdir(path)

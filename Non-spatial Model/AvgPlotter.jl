@@ -6,6 +6,12 @@ using CSV, Plots, DifferentialEquations
 
 cd("C:\\Users\\peter\\Onedrive\\Desktop\\cyst fib\\OxygenModels")
 
+# data =========================================================================
+tdata = [0; 14; 19; 26; 28; 31; 33; 35; 38]
+cdata = [0.8683; 0.6897; 0.6986; 0.3270; 0.1840; 0.4025; 0.3302; 0.8594; 0.9077]
+fdata = [0.1317; 0.3103; 0.3014; 0.6730; 0.8160; 0.5975; 0.6698; 0.1406; 0.0923]
+# ==============================================================================
+
 # stuff = CSV.read("Simulations\\AB_avgs.csv", Matrix, skipto = 2)
 stuff = CSV.read("Simulations\\AB_avgs.csv")
 stuff = convert(Matrix{Float64}, stuff)
@@ -50,7 +56,8 @@ k = 10000
 
 p = [Ec,Ac,nc,rf,d,ϵ,μ,η,k]
 
-y0 = [0.8283,0.0165,0.1388]
+# y0 = [0.8283,0.0165,0.1388] # best fitting ode parameters
+y0 = [0.8789,0.0165,0.1388]
 tspan = (0.0,40.0)
 prob = ODEProblem(cf_ode!,y0,tspan,p)
 sol = solve(prob)
@@ -60,21 +67,17 @@ sol = solve(prob)
 # Plots =======================================================================#
 
 p = plot(c_avg./k, color = :blue, label = "C ABM Mean",lw = 2)
-p = plot!(c_25./k, color = :blue, label = "C ABM 2.5th percentile",lw = 0.5)
-p = plot!(c_975./k, color = :blue, label = "C ABM 97.5th percentile",lw = 0.5)
+p = plot!(c_25./k, color = :blue, label = "C ABM 95th percentile",lw = 0.5, linestyle = :dashdot)
+p = plot!(c_975./k, color = :blue, label = "",lw = 0.5, linestyle = :dashdot)
 p = plot!(f_avg./k, color = :red, label = "F ABM Mean",lw = 2)
-p = plot!(f_25./k, color = :red, label = "F ABM 2.5th percentile", lw = 0.5)
-p = plot!(f_975./k, color = :red, label = "F ABM 97.5th percentile",lw = 0.5)
-p = plot!(24*sol.t,sol[1,:], label = "C ODE",lw = 2)
-p = plot!(24*sol.t,sol[2,:], label = "F ODE",lw = 2, legend=:left, xlabel = "t (hours)", ylabel = "Rel. Abundance")
+p = plot!(f_25./k, color = :red, label = "F ABM 95th percentile", lw = 0.5, linestyle = :dashdot)
+p = plot!(f_975./k, color = :red, label = "",lw = 0.5, linestyle = :dashdot)
+p = plot!(24*sol.t,sol[1,:], label = "C ODE", lw = 2)
+p = plot!(24*sol.t,sol[2,:], label = "F ODE", lw = 2, legend=:left, xlabel = "Time (days)", ylabel = "Population Density")
+p = plot!(xticks = (0:120:960, ["0","5","10","15","20","25","30","35","40"]))
+p = scatter!(tdata*24, cdata, label = "C Data", markershape = :hexagon, color = :blue)
+p = scatter!(tdata*24, fdata, label = "F Data", markershape = :hexagon, color = :red, legendfontsize=7)
+
 display(p)
 
 vline!([24*28], label = "Start of treatment")
-# p1 = plot((C./n^2)[C.>0],label = "C ABM", lw = 2)
-# p1 = plot!((F./n^2)[F.>0],label = "F ABM", lw = 2)
-# p1 = plot!(24*sol.t,sol[1,:], label = "C ODE")
-# p1 = plot!(24*sol.t,sol[2,:], label = "F ODE", legend=:left)
-# p2 = plot(ox)
-# p2 = plot!(24*sol.t,sol[3,:])
-# p = plot(p1,p2,layout = (2,1),legend=false)
-# display(p)
