@@ -44,6 +44,7 @@ f_975 = stuff[:,6]
 # mean series
 p = plot!(c_avg, color = :blue, label = "C ABM Mean",lw = 2)
 p = plot!(f_avg, color = :red, label = "F ABM Mean",lw = 2, title = "g = $g")
+p = plot!(xlabel = "Time (hours)", ylabel = "Population Density")
 
 # # 95th percentiles
 # p = plot!(c_25, color = :blue, label = "C ABM 95th percentile",lw = 0.5, linestyle = :dashdot)
