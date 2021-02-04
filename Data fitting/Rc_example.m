@@ -3,7 +3,7 @@
 w = linspace(0,0.25);
 E = 16.5;
 A = 0.0198;
-n = 2.0455;
+n = 3;
 
 rc = zeros(length(w),1);
 
