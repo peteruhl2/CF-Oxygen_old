@@ -1,7 +1,17 @@
-### Simple solver for the CF ode model
-### 1/27/21
+### Solver for messing with different treatment times
+### 2/8/21
 
 using Plots, DifferentialEquations
+
+function Treat(t,f)
+    # if f >= 0.5
+    if 25 < t < 30
+        return 0.1
+    else
+        return 0.0
+    end
+end
+
 
 function cf_ode!(yp,y,p,t)
     Ec,Ac,nc,rf,d,ϵ,μ,η,k = p
@@ -19,14 +29,14 @@ function cf_ode!(yp,y,p,t)
 
     # climax has non constant growth
     yp[1] = (Ec*w^nc/(Ac^nc + w^nc))*c*(1 - c - α*f) - d*c
-    yp[2] = rf*f*(1 - f - β*c) - d*f - ϵ*f
+    yp[2] = rf*f*(1 - f - β*c) - d*f - Treat(t,f)*f
     yp[3] = λ - μ*w - η*k*c*w
-
+    # println(Treat(t,f))
 end
 
 # ode parameters
 Ec = 18.98736; Ac = 0.0139; nc = 1.0
-rf = 17.28736; d = 0.6016; ϵ = 0.0; μ = 1.27273;
+rf = 19.28736; d = 0.6016; ϵ = 0.0; μ = 1.27273;
 k = 10000
 η = 0.8176/k
 λ = 0.22
@@ -41,7 +51,7 @@ c_only = (Ec*λ - d*λ -Ac*d*μ)/(Ac*d*k*η + Ec*λ)
 w_c = (Ac*d*k*η + Ec*λ)/(Ec*k*η + Ec*μ - d*k*η)
 y0 = [c_only, 0.2, w_c] # climax only equilibrium
 
-tspan = (0.0,40.0)
+tspan = (0.0,100.0)
 
 prob = ODEProblem(cf_ode!,y0,tspan,p)
 sol = solve(prob)
