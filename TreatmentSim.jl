@@ -5,8 +5,8 @@ using Plots, DifferentialEquations
 
 function Treat(t,f)
     # if f >= 0.5
-    if 25 < t < 30
-        return 0.1
+    if 25 < t < 40
+        return 0.5
     else
         return 0.0
     end
@@ -51,7 +51,7 @@ c_only = (Ec*λ - d*λ -Ac*d*μ)/(Ac*d*k*η + Ec*λ)
 w_c = (Ac*d*k*η + Ec*λ)/(Ec*k*η + Ec*μ - d*k*η)
 y0 = [c_only, 0.2, w_c] # climax only equilibrium
 
-tspan = (0.0,100.0)
+tspan = (0.0,120.0)
 
 prob = ODEProblem(cf_ode!,y0,tspan,p)
 sol = solve(prob)
