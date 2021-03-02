@@ -15,7 +15,7 @@ fdata = data(:,3);
 % fixed parameters
 global lambda rcmin rfmin t_treat alpha beta
 
-lambda = 0.22;
+lambda = 0.0094;
 rcmin = 0;
 rfmin = 0;
 t_treat = 28.;
@@ -31,7 +31,7 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 
 % parameters to fit
 Ec = 16.3653; % try < 16
-Ac = 0.0198;
+Ac = 0.0598;
 nc = 1.0376;
 
 rf = 18.2171;
@@ -41,8 +41,8 @@ dc = d;
 df = d;
 
 ep = 0.5743;
-mu = 2.7079;
-keta = 0.6281;
+mu = 1.0;
+keta = 3.3e-7;
 
 c0 = 0.9313;
 f0 = 0.0161;
@@ -107,7 +107,7 @@ ub = [Inf Inf Inf Inf Inf Inf Inf Inf 1.3*cdata(1) 1.3*fdata(1) 0.22];
 
 tic
 % [p,fval,flag,output] = fmincon(@cf_err,p,A,b,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
-% [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
+[p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
 toc
 
 

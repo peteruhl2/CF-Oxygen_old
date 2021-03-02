@@ -3,10 +3,10 @@
 
 using Plots, DifferentialEquations
 
-function Treat(t,f)
-    # if f >= 0.5
-    if 25 < t < 40
-        return 0.5
+
+function Treat(f, t, t_start, t_end)
+    if t > t_start && t < t_end
+        return 0.8
     else
         return 0.0
     end
@@ -14,44 +14,43 @@ end
 
 
 function cf_ode!(yp,y,p,t)
-    Ec,Ac,nc,rf,d,ϵ,μ,η,k = p
+    Ec,Ac,nc,rf,d,ϵ,μ,η,k,q = p
     c,f,w = y
 
     α = 1
     β = 1
-    λ = 0.22
+    λ = 0.0094
 
-    t_treat = 28
-    ϵ = 0
-    if t >= t_treat
-        ϵ = p[6]
-    end
+    t_start = 25
+    t_end = t_start + 5
+    ϵ = Treat(f, t, t_start, t_end)
 
     # climax has non constant growth
-    yp[1] = (Ec*w^nc/(Ac^nc + w^nc))*c*(1 - c - α*f) - d*c
-    yp[2] = rf*f*(1 - f - β*c) - d*f - Treat(t,f)*f
+    yp[1] = (Ec*w^nc/(Ac^nc + w^nc))*c*(1 - (f + c)) - d*c
+    yp[2] = rf*f*(1 - (f + c)) - d*f - ϵ*f - q*w*f
     yp[3] = λ - μ*w - η*k*c*w
     # println(Treat(t,f))
 end
 
 # ode parameters
-Ec = 18.98736; Ac = 0.0139; nc = 1.0
-rf = 19.28736; d = 0.6016; ϵ = 0.0; μ = 1.27273;
-k = 10000
-η = 0.8176/k
-λ = 0.22
+Ec = 11.9435; Ac = 0.0007; nc = 1.0
+rf = 26.2009; d = 0.2249; ϵ = 0.0; μ = 1.0;
+q = 0.2117
+k = 1e8
+η = 3.3e-16
+λ = 0.0094
 
-p = [Ec,Ac,nc,rf,d,ϵ,μ,η,k]
+p = [Ec,Ac,nc,rf,d,ϵ,μ,η,k,q]
 
 ### different initial condtions
-# y0 = [0.8283,0.0165,0.1388] # best fitting ode parameters
+y0 = [0.8913,0.0028,0.0115] # best fitting ode parameters
 # y0 = [0.0000008789,(rf-d)/rf,λ/μ] # attack only equilibrium
 
 c_only = (Ec*λ - d*λ -Ac*d*μ)/(Ac*d*k*η + Ec*λ)
 w_c = (Ac*d*k*η + Ec*λ)/(Ec*k*η + Ec*μ - d*k*η)
-y0 = [c_only, 0.2, w_c] # climax only equilibrium
+# y0 = [c_only, 0.2, w_c] # climax only equilibrium
 
-tspan = (0.0,120.0)
+tspan = (0.0,40.0)
 
 prob = ODEProblem(cf_ode!,y0,tspan,p)
 sol = solve(prob)
@@ -69,8 +68,8 @@ y2 = rf*(1 + Ac*(μ/λ))
 
 
 # p = plot(sol.t[c.>0],c[c.>0], label = "C ODE", lw = 2, yaxis=:log)
-# p = plot!(sol.t[f.>0],f[f.>0], label = "F ODE", lw = 2, legend=:left, xlabel = "Time (days)", ylabel = "Population Density",yaxis=:log)
-p = plot(sol.t[c.>0],c[c.>0], label = "C ODE", lw = 2)
+# p = plot!(sol.t[f.>0],f[f.>0], label = "F ODE", lw = 2, legend=:right, xlabel = "Time (days)", ylabel = "Population Density",yaxis=:log)
+p = plot!(sol.t[c.>0],c[c.>0], label = "C ODE", lw = 2)
 p = plot!(sol.t[f.>0],f[f.>0], label = "F ODE", lw = 2, legend=:left, xlabel = "Time (days)", ylabel = "Population Density")
 
 

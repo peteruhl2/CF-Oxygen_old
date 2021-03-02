@@ -34,11 +34,11 @@ Ec = 9; % try < 16
 Ac = 0.0128;
 nc = 1.0;
 
-rf = 14;
+rf = 11;
 
-d = 0.2000;
+d = 0.1000;
 dc = d;
-df = d;
+df = 0.15;
 
 ep = 0.5743;
 mu = 1.2079;
@@ -49,7 +49,7 @@ c0 = 0.9313;
 f0 = 0.0561;
 w0 = 0.0812;
 
-p = [Ec,rf,d,ep,q,c0,f0,w0];
+p = [Ec,rf,dc,df,ep,q,c0,f0,w0];
 
 A = []; b = []; Aeq = []; Beq = []; 
 lb = [0 0 0 0 0 0 0.95 0 0.8*cdata(1) 0.08*fdata(1) 0.1]; 
@@ -105,20 +105,20 @@ rc = (p(1)*w.^p(3))./(p(2)^p(3) + w.^p(3));
 % title('Climax growth rate')
 
 %%% Functions =============================================================
-
+[Ec,rf,dc,df,ep,q,c0,f0,w0];
 %%% cf ode function
 function yp = cf_eqs(t,y,p)
 global lambda rcmin t_treat alpha beta
 
 Ec = p(1);
 rf = p(2);
-d = p(3); ep = 0; mu = p(4); keta = 0.6281;
-q = p(5);
+ep = 0; mu = 1; keta = 0.6281;
+q = p(6);
 
-dc = d; df = d;
+dc = (3); df = (4);
 
 if t >= t_treat
-    ep = p(4);
+    ep = p(5);
 end
 
 c = y(1);
@@ -140,7 +140,7 @@ end
 %%% objective function for cf_fitter
 function J = cf_err(p,tdata,cdata,fdata)
 y0 = [0.8138, 0.1234, 0.15];
-y0(1) = p(6); y0(2) = p(7); y0(3) = p(8);
+y0(1) = p(7); y0(2) = p(8); y0(3) = p(9);
 [t,y] = ode15s(@cf_eqs,tdata,y0,[],p);
 
 % odata = 0.22*ones(length(tdata),1);

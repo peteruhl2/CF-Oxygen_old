@@ -15,7 +15,7 @@ fdata = data(:,3);
 % fixed parameters
 global lambda rcmin rfmin t_treat alpha beta
 
-lambda = 0.22;
+lambda = 0.0094;
 rcmin = 0;
 rfmin = 0;
 t_treat = 28.;
@@ -30,30 +30,33 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 % options = optimset('MaxFunEvals',5000);
 
 % parameters to fit
-Ec = 10; % try < 16
-Ac = 0.0128;
-nc = 1.0;
+Ec = 9.5747; % try < 16
+Ac = 0.00095;
+% nc = 1.0;
 
-rf = 14;
+rf = 9.5082;
 
-d = 0.3000;
+d = 0.3436;
 dc = d;
 df = d;
 
-ep = 0.5743;
-mu = 1.2079;
-keta = 0.6281;
-q = 0.15;
+ep = 0.5722;
+mu = 1.0; %704;
+keta = 2.4e-4;
+q = 0.1634;
 
-c0 = 0.9313;
-f0 = 0.0561;
-w0 = 0.0812;
+c0 = 0.9621;
+f0 = 0.0283;
+w0 = 0.0053;
 
-p = [Ac,d,ep,mu,q,c0,f0,w0];
+p = [Ac,d,ep,q,c0,f0,w0,Ec,rf];
+% p = [Ac,d,ep,q,Ec,rf,keta];
 
 A = []; b = []; Aeq = []; Beq = []; 
-lb = [0 0 0 0 0 0 0.95 0 0.8*cdata(1) 0.08*fdata(1) 0.1]; 
-ub = [Inf Inf Inf Inf Inf Inf Inf Inf 1.3*cdata(1) 1.3*fdata(1) 0.22];
+% lb = [0 0 0 0 0 0 0.95 0 0.8*cdata(1) 0.08*fdata(1) 0.1]; 
+% ub = [Inf Inf Inf Inf Inf Inf Inf Inf 1.3*cdata(1) 1.3*fdata(1) 0.22];
+lb = zeros(9,1);
+ub = [0.1 1 1 3 1 0.5 0.3 20 30];
 
 
 tic
@@ -63,7 +66,7 @@ toc
 
 
 % solve ode's
-y0 = [p(6), p(7), p(8)];
+y0 = [p(5), p(6), p(7)];
 tspan = [0 40];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 J = cf_err(p,tdata,cdata,fdata)
@@ -94,15 +97,15 @@ ylabel('Oxygen')
 title('Oxygen')
 
 %%% =======================================================================
-%%% plot rc(w)
-w = y(:,3);
-rc = (p(1)*w.^p(3))./(p(2)^p(3) + w.^p(3));
-
-figure()
-plot(t,rc)
-xlabel('Time (days)')
-ylabel('Climax growth rate')
-title('Climax growth rate')
+% %%% plot rc(w)
+% w = y(:,3);
+% rc = (p(1)*w.^p(3))./(p(2)^p(3) + w.^p(3));
+% 
+% figure()
+% plot(t,rc)
+% xlabel('Time (days)')
+% ylabel('Climax growth rate')
+% title('Climax growth rate')
 
 %%% Functions =============================================================
 
@@ -110,10 +113,10 @@ title('Climax growth rate')
 function yp = cf_eqs(t,y,p)
 global lambda rcmin t_treat alpha beta
 
-Ec = 11; Ac = p(1); nc = 1;
-rf = 12;
-d = p(2); ep = 0; mu = p(4); keta = 0.6281;
-q = p(5);
+Ec = p(8); Ac = p(1); nc = 1;
+rf = p(9);
+d = p(2); ep = 0; mu = 1; keta = 2.4e-4;
+q = p(4);
 
 dc = d; df = d;
 
@@ -139,8 +142,8 @@ end
 
 %%% objective function for cf_fitter
 function J = cf_err(p,tdata,cdata,fdata)
-y0 = [0.8138, 0.1234, 0.15];
-y0(1) = p(6); y0(2) = p(7); y0(3) = p(8);
+% y0 = [0.9, 0.1, 0.0094];
+y0(1) = p(5); y0(2) = p(6); y0(3) = p(7);
 [t,y] = ode15s(@cf_eqs,tdata,y0,[],p);
 
 % odata = 0.22*ones(length(tdata),1);

@@ -4,7 +4,7 @@
 using Plots, DifferentialEquations
 
 function cf_ode!(yp,y,p,t)
-    Ec,Ac,nc,rf,d,ϵ,μ,η,k = p
+    Ec,Ac,nc,rf,d,ϵ,μ,η,k,q = p
     c,f,w = y
 
     α = 1
@@ -19,19 +19,20 @@ function cf_ode!(yp,y,p,t)
 
     # climax has non constant growth
     yp[1] = (Ec*w^nc/(Ac^nc + w^nc))*c*(1 - c - α*f) - d*c
-    yp[2] = rf*f*(1 - f - β*c) - d*f - ϵ*f
+    yp[2] = rf*f*(1 - f - β*c) - d*f - ϵ*f - q*f*w
     yp[3] = λ - μ*w - η*k*c*w
 
 end
 
 # ode parameters
-Ec = 18.98736; Ac = 0.0139; nc = 1.0
-rf = 17.28736; d = 0.6016; ϵ = 0.0; μ = 1.27273;
-k = 10000
+Ec = 0.58736; Ac = 0.0139; nc = 1.0
+rf = 15.98736; d = 0.6016; ϵ = 0.0; μ = 1.27273
+q = 9.0;
+k = 1e9
 η = 0.8176/k
 λ = 0.22
 
-p = [Ec,Ac,nc,rf,d,ϵ,μ,η,k]
+p = [Ec,Ac,nc,rf,d,ϵ,μ,η,k,q]
 
 ### different initial condtions
 # y0 = [0.8283,0.0165,0.1388] # best fitting ode parameters
@@ -39,9 +40,9 @@ p = [Ec,Ac,nc,rf,d,ϵ,μ,η,k]
 
 c_only = (Ec*λ - d*λ -Ac*d*μ)/(Ac*d*k*η + Ec*λ)
 w_c = (Ac*d*k*η + Ec*λ)/(Ec*k*η + Ec*μ - d*k*η)
-y0 = [c_only, 0.2, w_c] # climax only equilibrium
+y0 = [c_only*0.1, 0.2, w_c] # climax only equilibrium
 
-tspan = (0.0,10000.0)
+tspan = (0.0,250.0)
 
 prob = ODEProblem(cf_ode!,y0,tspan,p)
 sol = solve(prob)
@@ -58,10 +59,10 @@ y1 = rf*((Ac/λ)*(k*η + μ) + 1) - (Ac/λ)*d*k*η
 y2 = rf*(1 + Ac*(μ/λ))
 
 
-# p = plot(sol.t[c.>0],c[c.>0], label = "C ODE", lw = 2, yaxis=:log)
-# p = plot!(sol.t[f.>0],f[f.>0], label = "F ODE", lw = 2, legend=:left, xlabel = "Time (days)", ylabel = "Population Density",yaxis=:log)
-p = plot(sol.t[c.>0],c[c.>0], label = "C ODE", lw = 2)
-p = plot!(sol.t[f.>0],f[f.>0], label = "F ODE", lw = 2, legend=:left, xlabel = "Time (days)", ylabel = "Population Density")
+p = plot(sol.t[c.>0],c[c.>0], label = "Climax", lw = 2, yaxis=:log)
+p = plot!(sol.t[f.>0],f[f.>0], label = "Attack", lw = 2, legend=:topright, xlabel = "Time (days)", ylabel = "Population Density",yaxis=:log)
+# p = plot(sol.t[c.>0],c[c.>0], label = "Climax", lw = 2)
+# p = plot!(sol.t[f.>0],f[f.>0], label = "Attack", lw = 2, legend=:topright, xlabel = "Time (days)", ylabel = "Population Density")
 
 
 display(p)
