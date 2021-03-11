@@ -3,17 +3,17 @@
 
 close all;
 
-data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
+data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Sheet1');
 tdata = data(:,1);
-% cdata = data(:,2)/100;
-% fdata = data(:,3)/100;
-cdata = data(:,2);
-fdata = data(:,3);
+cdata = data(:,2)/100;
+fdata = data(:,3)/100;
+% cdata = data(:,2);
+% fdata = data(:,3);
 
 %%% =======================================================================
 
 % fixed parameters
-global beta r d k lambda mu eta t_treat N0
+global d k lambda t_treat N0
 
 N0 = 6.7e8;
 lambda = 1.32;
@@ -28,34 +28,36 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 r = 30.5;
 
 beta = 0.95*r; % try < 16
-b = 2.9440e-05;
-n = 1.7652;
+b = 1.5983e-03;
+n = 1.8160;
 
 d = 6.0;
 
 ep = 0.5642;
-mu = 1.32; % 1/5 min
+mu = 10*24; % 1/5 min
 
 k = 10^12;
-eta = 2.7e-9;
-q = 31.0727;
+eta = 2.7e-8;
+q = 0.002711;
 
-frac = 0.8459;
+frac = 0.8477;
 c0 = frac*N0;
 f0 = (1 - frac)*N0;
-x0 = 1.32;
+x0 = 0.12;
 
-p = [b,n,q,ep,frac];
+lambda = mu*x0;
+
+p = [b,n,q,ep,frac,beta,r,mu,eta];
 
 
 A = []; b = []; Aeq = []; Beq = [];
 lb = zeros(5,1);
-ub = [1 5 200 200 1];
+ub = [1 5 2000 200 1];
 
 
 tic
-[p,fval,flag,output] = fmincon(@cf_err,p,A,b,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
-% [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
+% [p,fval,flag,output] = fmincon(@cf_err,p,A,b,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
+[p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
 toc
 
 
@@ -101,12 +103,16 @@ title('Oxygen')
 
 %%% cf ode function
 function yp = cf_eqs(t,y,p)
-global beta r d k lambda mu eta t_treat
+global d k lambda t_treat
 
 b = p(1); 
 n = p(2);
 q = p(3);
 ep = 0; 
+beta = p(6);
+r = p(7);
+mu = p(8);
+eta = p(9);
 
 
 if t >= t_treat
@@ -142,7 +148,8 @@ Ct = y(:,1)./(y(:,1) + y(:,2));
 Ft = y(:,2)./(y(:,1) + y(:,2));
 
 errx = Ct - cdata;
-erry = Ft - fdata;
+% erry = Ft - fdata;
 
-J = errx'*errx + erry'*erry;
+% J = errx'*errx + erry'*erry;
+J = errx'*errx;
 end
