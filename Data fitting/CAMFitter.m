@@ -13,7 +13,7 @@ fdata = data(:,3)/100;
 %%% =======================================================================
 
 % fixed parameters
-global d k lambda t_treat N0
+global k lambda t_treat N0
 
 N0 = 6.7e8;
 lambda = 1.32;
@@ -25,29 +25,29 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 % options = optimset('MaxFunEvals',5000);
 
 % parameters to fit
-r = 30.5;
+r = 24.1532;
 
-beta = 0.95*r; % try < 16
-b = 1.5983e-03;
-n = 1.8160;
+beta = 23.1363; % try < 16
+b = 3.81e-01;
+n = 1.3858;
 
 d = 6.0;
 
-ep = 0.5642;
-mu = 10*24; % 1/5 min
+ep = 0.6357;
+mu = 1.787e7; % 1/5 min
 
-k = 10^12;
-eta = 2.7e-8;
-q = 0.002711;
+k = 10^10;
+eta = 5.7659e-5;
+q = 0.000246;
 
-frac = 0.8477;
+frac = 0.8901;
 c0 = frac*N0;
 f0 = (1 - frac)*N0;
-x0 = 0.12;
+x0 = 200;
 
 lambda = mu*x0;
 
-p = [b,n,q,ep,frac,beta,r,mu,eta];
+p = [b,n,q,ep,frac,beta,r,mu,eta,d];
 
 
 A = []; b = []; Aeq = []; Beq = [];
@@ -103,7 +103,7 @@ title('Oxygen')
 
 %%% cf ode function
 function yp = cf_eqs(t,y,p)
-global d k lambda t_treat
+global k lambda t_treat
 
 b = p(1); 
 n = p(2);
@@ -113,7 +113,7 @@ beta = p(6);
 r = p(7);
 mu = p(8);
 eta = p(9);
-
+d = p(10);
 
 if t >= t_treat
     ep = p(4);
