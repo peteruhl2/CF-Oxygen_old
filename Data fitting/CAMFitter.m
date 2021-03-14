@@ -3,12 +3,12 @@
 
 close all;
 
-data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Sheet1');
+data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
 tdata = data(:,1);
-cdata = data(:,2)/100;
-fdata = data(:,3)/100;
-% cdata = data(:,2);
-% fdata = data(:,3);
+% cdata = data(:,2)/100;
+% fdata = data(:,3)/100;
+cdata = data(:,2);
+fdata = data(:,3);
 
 %%% =======================================================================
 
@@ -25,25 +25,25 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 % options = optimset('MaxFunEvals',5000);
 
 % parameters to fit
-r = 24.1532;
+r = 24.3787;
 
-beta = 23.1363; % try < 16
-b = 3.81e-01;
-n = 1.3858;
+beta = 23.5113; % try < 16
+b = 4.037e-01;
+n = 1.3774;
 
-d = 6.0;
+d = 5.9775;
 
-ep = 0.6357;
-mu = 1.787e7; % 1/5 min
+ep = 0.5057;
+mu = 1.8019e7; % 1/5 min
 
-k = 10^10;
-eta = 5.7659e-5;
-q = 0.000246;
+k = 10^13;
+eta = 3.9478e-7;
+q = 0.00026781;
 
-frac = 0.8901;
+frac = 0.9826;
 c0 = frac*N0;
 f0 = (1 - frac)*N0;
-x0 = 200;
+x0 = 180;
 
 lambda = mu*x0;
 
@@ -51,27 +51,30 @@ p = [b,n,q,ep,frac,beta,r,mu,eta,d];
 
 
 A = []; b = []; Aeq = []; Beq = [];
-lb = zeros(5,1);
-ub = [1 5 2000 200 1];
+lb = zeros(10,1);
+ub = [1 5 1 2 1 30 30 1e8 1 10];
 
 
 tic
-% [p,fval,flag,output] = fmincon(@cf_err,p,A,b,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
-[p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
+[p,fval,flag,output] = fmincon(@cf_err,p,A,b,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
+% [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
 toc
 
 
 % solve ode's
 y0 = [c0; f0; x0];
 tspan = [0 40];
+% tspan = tdata;
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 J = cf_err(p,tdata,cdata,fdata)
 p
+[sol,C_err,F_err] = err_vec(p,tdata,cdata,fdata);
 
 %%% relative abundances
 Ct = y(:,1)./(y(:,1) + y(:,2));
 Ft = y(:,2)./(y(:,1) + y(:,2));
 
+figure()
 hold on; box on;
 plot(t,Ct,'Linewidth',2)
 plot(t,Ft,'Linewidth',2)
@@ -139,7 +142,7 @@ frac = p(5);
 
 c0 = frac*N0;
 f0 = (1 - frac)*N0;
-x0 = 1.32;
+x0 = 180;
 
 y0 = [c0; f0; x0];
 [t,y] = ode15s(@cf_eqs,tdata,y0,[],p);
@@ -152,4 +155,30 @@ errx = Ct - cdata;
 
 % J = errx'*errx + erry'*erry;
 J = errx'*errx;
+end
+
+%%% Function to return two error vectors (and ode solution in rel. abund.)
+function [sol,C_err,F_err] = err_vec(p,tdata,cdata,fdata)
+global N0
+% solve ode
+frac = p(5);
+
+c0 = frac*N0;
+f0 = (1 - frac)*N0;
+x0 = 180;
+y0 = [c0; f0; x0];
+[t,y] = ode15s(@cf_eqs,tdata,y0,[],p);
+
+% return error vectors
+Ct = y(:,1)./(y(:,1) + y(:,2));
+Ft = y(:,2)./(y(:,1) + y(:,2));
+
+C_err = Ct - cdata;
+F_err = Ft - fdata;
+
+% return solution too
+sol = [t y];
+sol(:,2) = Ct;
+sol(:,3) = Ft;
+
 end
