@@ -28,20 +28,20 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 x0 = 20;
 
 % parameters to fit
-r = 24.7543;
+r = 15.7543;
 
-beta = 23.6970; % try < 16
+beta = 25.6970; % try < 16
 b = 12.8139;
 n = 1.0;
 
 d = 6;
 
 ep = 0.4614;
-mu = 1.7019e6; % 1/5 min
+mu = x0*12*60*24; % 1/5 min
 
 k = 10^10;
 eta = 1.0075e-5;
-q = 0.0100;
+q = 0.0010;
 
 frac = 0.9866;
 
@@ -56,7 +56,7 @@ ub = [150 10.0 1 2 1 40 40 1e-3];
 
 
 tic
-% [p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
+[p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
 % [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
 toc
 
