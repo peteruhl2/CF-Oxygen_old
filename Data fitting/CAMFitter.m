@@ -25,12 +25,12 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 % options = optimset('MaxFunEvals',5000);
 
 %%% initial oxygen
-x0 = 20;
+x0 = 18;
 
 % parameters to fit
-r = 15.7543;
+r = 20.7543;
 
-beta = 25.6970; % try < 16
+beta = 20.6970; % try < 16
 b = 12.8139;
 n = 1.0;
 
@@ -56,7 +56,7 @@ ub = [150 10.0 1 2 1 40 40 1e-3];
 
 
 tic
-[p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
+% [p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
 % [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
 toc
 

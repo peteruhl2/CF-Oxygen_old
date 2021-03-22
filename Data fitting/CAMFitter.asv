@@ -13,7 +13,7 @@ fdata = data(:,3);
 %%% =======================================================================
 
 % fixed parameters
-global k lambda t_treat N0 d mu
+global k lambda t_treat N0 d mu x0
  
 N0 = 6.7e8;
 lambda = 1.32;
@@ -24,26 +24,26 @@ t_treat = 28.;
 options = optimset('MaxFunEvals',5000,'Display','iter');
 % options = optimset('MaxFunEvals',5000);
 
-% parameters to fit
-r = 23.1472;
+%%% initial oxygen
+x0 = 20;
 
-beta = 18.4831; % try < 16
-b = 125.6866;
-n = 4.7912;
+% parameters to fit
+r = 15.7543;
+
+beta = 15.6970; % try < 16
+b = 12.8139;
+n = 1.0;
 
 d = 6;
 
-ep = 0.6157;
-mu = 7.0019e6; % 1/5 min
+ep = 0.4614;
+mu = x0*12*60*24; % 1/5 min
 
 k = 10^10;
-eta = 1.0505e-5;
-q = 0.0081;
+eta = 1.0075e-5;
+q = 0.0010;
 
-frac = 0.9949;
-c0 = frac*N0;
-f0 = (1 - frac)*N0;
-x0 = 180;
+frac = 0.9866;
 
 lambda = mu*x0;
 
@@ -65,7 +65,7 @@ toc
 frac = p(5);
 c0 = frac*N0;
 f0 = (1 - frac)*N0;
-x0 = 180;
+% x0 = 90;
 
 y0 = [c0; f0; x0];
 tspan = [0 40];
@@ -141,13 +141,13 @@ end
 
 %%% objective function for cf_fitter
 function J = cf_err(p,tdata,cdata,fdata)
-global N0
+global N0 x0
 
 frac = p(5);
 
 c0 = frac*N0;
 f0 = (1 - frac)*N0;
-x0 = 180;
+% x0 = 90;
 
 y0 = [c0; f0; x0];
 [t,y] = ode15s(@cf_eqs,tdata,y0,[],p);
@@ -165,13 +165,13 @@ end
 
 %%% Function to return two error vectors (and ode solution in rel. abund.)
 function [sol,C_err,F_err] = err_vec(p,tdata,cdata,fdata)
-global N0
+global N0 x0
 % solve ode
 frac = p(5);
 
 c0 = frac*N0;
 f0 = (1 - frac)*N0;
-x0 = 180;
+% x0 = 90;
 y0 = [c0; f0; x0];
 [t,y] = ode15s(@cf_eqs,tdata,y0,[],p);
 
