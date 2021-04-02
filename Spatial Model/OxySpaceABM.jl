@@ -87,7 +87,7 @@ D[:,:,2] .= w
 
 # time stuff
 t = 0
-tmax = Inf #24*40
+tmax = 100#Inf #24*40
 t_treat = 24*28
 
 # ode stuff
