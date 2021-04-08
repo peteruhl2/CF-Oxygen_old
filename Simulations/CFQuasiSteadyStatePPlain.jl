@@ -50,13 +50,13 @@ q = 4.9954e-5
 
 frac = 0.5
 
+x0 = 17.74
 λ = μ*x0
 
 p = [β,b,n,r,k,d,ϵ,q,μ,η,x0]
 
 c0 = frac*N0
 f0 = (1 - frac)*N0
-x0 = 17.74
 
 tspan = (0.0,10000.0)
 y0 = [c0, f0]
@@ -71,17 +71,17 @@ for i = 1:50
     c0 = rand()*N0*frac
     f0 = rand()*N0*(1 - frac)
 
-    # maybe take c0 = 0
-    rn = rand()
-    if rn < 0.1
-        c0 = 0
-    end
-
-    # maybe take f0 = 0
-    rn = rand()
-    if rn < 0.1
-        f0 = 0
-    end
+    # # maybe take c0 = 0
+    # rn = rand()
+    # if rn < 0.1
+    #     c0 = 0
+    # end
+    #
+    # # maybe take f0 = 0
+    # rn = rand()
+    # if rn < 0.1
+    #     f0 = 0
+    # end
 
     y0 = [c0, f0]
 
