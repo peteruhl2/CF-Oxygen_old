@@ -61,7 +61,7 @@ f0 = (1 - frac)*N0
 x0 = 17.74
 
 tspan = (0.0,10.0)
-y0 = [c0*0, f0, x0]
+y0 = [c0, f0, x0]
 
 prob = ODEProblem(cf_ode!,y0,tspan,p)
 sol = solve(prob)
