@@ -16,8 +16,8 @@ fdata = data(:,3);
 global k lambda t_b t_c N0 mu b n
  
 N0 = 6.7e8;
-t_b = 19+7;
-t_c = 33;
+t_b = 19;
+t_c = 28;
 
 %%% =======================================================================
 % do optimization here
@@ -25,38 +25,40 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 % options = optimset('MaxFunEvals',5000);
 
 %%% initial oxygen
-x0 = 17.7082;
+x0 = 24.5632;
 
 % parameters to fit
-r = 24.6262;
+r = 9.2129;
 
-beta = 18.7624; % try < 16
+beta = 20.5752; % try < 16
 b = 12.4;
 n = 1.0;
 
-d = 0.1030;
+dn = 0.1254; % natural death rate
+dbs = 0.3037; % death due to bs antibiotics
+alpha = 0.528; % fractional reduction of bs antibiotics in killing attack
 
-ep = 1.1688;
+ep = 0.3668;
 mu = 200*23*60*24; % 1/5 min
 
 k = 10^10;
-eta = 4.1834e-4;
+eta = 5.1834e-4;
 q = 4.9954e-5;
 
-frac = 0.9998;
+frac = 0.9857;
 
 lambda = mu*x0;
 
-p = [x0,frac,beta,r,eta,d,ep,q];
+p = [x0,frac,beta,r,eta,dbs,dn,alpha,ep,q];
 
 
 A = []; b_opt = []; Aeq = []; Beq = [];
-lb = zeros(8,1);
-ub = [200 1.0 25 25 1e-3 4 1.5 1e-4];
+lb = zeros(10,1);
+ub = [200 1.0 25 25 1e-3 10 10 1 1.5 1e-4];
 
 
 tic
-% [p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
+[p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
 % [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
 toc
 
@@ -110,12 +112,12 @@ title('Oxygen')
 %%% Functions =============================================================
 
 %%% broad spectrum antibiotic function
-function d = BrSpec(t,p)
+function dbs = BrSpec(t,p)
     global t_b
     if t < t_b
-        d = p(6);
+        dbs = p(6);
     else 
-        d = 0;
+        dbs = 0;
     end
 end
 
@@ -126,15 +128,21 @@ global k lambda t_c mu b n
 beta = p(3);
 r = p(4);
 eta = p(5);
-d = BrSpec(t,p);
+dbs = BrSpec(t,p);
+dn = p(7);
+alpha = p(8);
 ep = 0;
-q = p(8);
+q = p(10);
 
 lambda = mu*p(1);
 
 if t >= t_c
-    ep = p(7);
+    ep = p(9);
 end
+
+%%% total death rates
+dc = dn + dbs;
+df = dn + alpha*dbs;
 
 c = y(1);
 f = y(2);
@@ -142,9 +150,9 @@ x = y(3);
 
 yp = zeros(3,1);
 
-yp(1) = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - d*c;
-% yp(2) = r*f*(1 - (f + c)/k) - d*f - ep*f - q*f*x;
-yp(2) = r*f*(1 - (f + c)/k) - ep*f - q*f*x;
+yp(1) = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - dc*c;
+% yp(2) = r*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
+yp(2) = (r + beta*(1 - x^n/(b^n + x^n)))*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
 yp(3) = lambda - mu*x - eta*(c)*x;
 
 % hold on

@@ -68,8 +68,8 @@ f0 = (1 - frac)*N0;
 
 y0 = [c0; f0; x0];
 tspan = [0 40];
+% [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
-% [t, y] = ode45(@(t,y) cf_eqs(t,y,p), tspan, y0);
 J = cf_err(p,tdata,cdata,fdata)
 p
 

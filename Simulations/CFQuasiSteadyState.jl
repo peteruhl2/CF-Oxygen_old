@@ -60,10 +60,10 @@ x0 = 17.74
 
 p = [β,b,n,r,k,d,ϵ,q,μ,η,x0]
 
-c0 = frac*N0*1e-5*0
+c0 = frac*N0
 f0 = (1 - frac)*N0
 
-tspan = (0.0,3.0)
+tspan = (0.0,30.0)
 y0 = [c0, f0]
 
 prob = ODEProblem(cf_ode!,y0,tspan,p)
