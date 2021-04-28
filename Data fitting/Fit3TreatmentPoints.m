@@ -13,11 +13,12 @@ fdata = data(:,3);
 %%% =======================================================================
 
 % fixed parameters
-global k lambda t_b t_c N0 mu b n
+global k lambda t_b t_c N0 mu
  
 N0 = 6.7e8;
 t_b = 19;
-t_c = 28;
+t_c = 33;
+% t_c = t_b + 9;
 
 %%% =======================================================================
 % do optimization here
@@ -25,41 +26,43 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 % options = optimset('MaxFunEvals',5000);
 
 %%% initial oxygen
-x0 = 24.5632;
+x0 = 14.6287;
 
 % parameters to fit
-r = 9.2129;
+r = 0.0046;
 
-beta = 20.5752; % try < 16
-b = 12.4;
-n = 1.0;
+beta = 16.6388; % try < 16
+b = 13.4256;
+n = 2.6626;
 
-dn = 0.1254; % natural death rate
-dbs = 0.3037; % death due to bs antibiotics
-alpha = 0.528; % fractional reduction of bs antibiotics in killing attack
+dn = 0.6045; % natural death rate
+dbs = 6.7686; % death due to bs antibiotics
+alpha = 0.8976; % fractional reduction of bs antibiotics in killing attack
 
-ep = 0.3668;
+ep = 1.2124;
 mu = 200*23*60*24; % 1/5 min
 
 k = 10^10;
-eta = 5.1834e-4;
-q = 4.9954e-5;
+eta = 3.1611e-4;
+q = 3.2747e-5;
 
-frac = 0.9857;
+frac = 0.8659;
 
 lambda = mu*x0;
 
-p = [x0,frac,beta,r,eta,dbs,dn,alpha,ep,q];
+p = [x0,frac,beta,r,...
+     eta,dbs,dn,alpha,...
+     ep,q,b,n];
 
 
 A = []; b_opt = []; Aeq = []; Beq = [];
-lb = zeros(10,1);
-ub = [200 1.0 25 25 1e-3 10 10 1 1.5 1e-4];
+lb = zeros(12,1);
+ub = [200 1.0 25 25 1e-3 10 10 1 1.5 1e-4 20 5];
 
 
 tic
-[p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
 % [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
+% [p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
 toc
 
 % solve ode's
@@ -123,7 +126,7 @@ end
 
 %%% cf ode function
 function yp = cf_eqs(t,y,p)
-global k lambda t_c mu b n
+global k lambda t_c mu
 
 beta = p(3);
 r = p(4);
@@ -133,6 +136,8 @@ dn = p(7);
 alpha = p(8);
 ep = 0;
 q = p(10);
+b = p(11);
+n = p(12);
 
 lambda = mu*p(1);
 
@@ -156,7 +161,8 @@ yp(2) = (r + beta*(1 - x^n/(b^n + x^n)))*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x
 yp(3) = lambda - mu*x - eta*(c)*x;
 
 % hold on
-% scatter(t,(beta*x^n/(b^n + x^n)))
+% scatter(t,(beta*x^n/(b^n + x^n)),'bo')
+% scatter(t,(r + beta*(1 - x^n/(b^n + x^n))),'rx')
 end
 
 %%% objective function for cf_fitter
