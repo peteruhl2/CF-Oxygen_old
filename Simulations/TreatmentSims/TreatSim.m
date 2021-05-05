@@ -1,7 +1,7 @@
-%%% fitter with accurate antibiotic timing with fewer parameters
-%%% 3/30/2020
+%%% script for doing treatment simulations
+%%% 4/26/2020
 
-close all;
+% close all;
 
 data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
 tdata = data(:,1);
@@ -14,11 +14,13 @@ fdata = data(:,3);
 
 % fixed parameters
 global k lambda t_b t_c N0 mu
+
+% global parameters for treatment
+global t_start t_end treat_true
  
 N0 = 6.7e8;
-t_b = 19;
-t_c = 33;
-% t_c = t_b + 9;
+t_b = 19*Inf;
+t_c = 33*Inf;
 
 %%% =======================================================================
 % do optimization here
@@ -43,27 +45,26 @@ ep = 1.2124;
 mu = 200*23*60*24; % 1/5 min
 
 k = 10^10;
-eta = 3.1611e-4;
+eta = 5.5611e-4; % increased a bit for simulations
 q = 3.2747e-5;
 
 frac = 0.8659;
 
-lambda = mu*x0;
+% lambda = mu*x0;
+lambda = 9.6901e+07*1.01;
 
 p = [x0,frac,beta,r,...
      eta,dbs,dn,gamma,...
      ep,q,b,n];
 
 
-A = []; b_opt = []; Aeq = []; Beq = [];
-lb = zeros(12,1);
-ub = [200 1.0 25 25 1e-3 10 10 1 1.5 1e-4 20 5];
+%%% Treament simulation stuff in here =====================================
+t_start = Inf;
+t_end = Inf;
+treat_true = 0;
 
 
-tic
-% [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
-[p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
-toc
+%%% =======================================================================
 
 % solve ode's
 x0 = p(1);
@@ -72,45 +73,51 @@ c0 = frac*N0;
 f0 = (1 - frac)*N0;
 
 y0 = [c0; f0; x0];
-tspan = [0 40];
+tspan = [0 80];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
-% [t, y] = ode45(@(t,y) cf_eqs(t,y,p), tspan, y0);
-J = cf_err(p,tdata,cdata,fdata)
-p
 
 %%% relative abundances
 Ct = y(:,1)./(y(:,1) + y(:,2));
 Ft = y(:,2)./(y(:,1) + y(:,2));
 
-figure()
+%%% this stuff will find the time between exacerbations ===================
+%%% =======================================================================
+
+swtchpts = find(islocalmax(Ft)); % Ft local maxes
+swtimes = t(swtchpts); % times when Ft changes direction
+
+% get time between switches
+try
+    etime = swtimes(end) - swtimes(end-1)
+catch
+    % do nothing if error
+end
+
+
+
+
+%%% =======================================================================
+
+% figure()
 hold on; box on;
 plot(t,Ct,'Linewidth',2)
 plot(t,Ft,'Linewidth',2)
-plot(tdata,cdata,'bx', 'LineWidth',2)
-plot(tdata,fdata,'rx', 'LineWidth',2)
+% plot(tdata,cdata,'bx', 'LineWidth',2)
+% plot(tdata,fdata,'rx', 'LineWidth',2)
 xlabel('Time (days)')
 ylabel('Relative Abundance')
 title('Climax and Attack Populations')
-xline(t_b)
-xline(t_c)
-legend('C model','F model','C data','F data','Location','w')
+% xline(t_b)
+% xline(t_c)
+% legend('C model','F model','C data','F data','Location','e')
+legend('C model','F model','Location','e')
 
-figure()
-plot(t,y(:,3),'Linewidth',2)
-xlabel('Time (days)')
-ylabel('Oxygen (\muM)')
-title('Oxygen')
-
-%%% =======================================================================
-% %%% plot rc(w)
-% w = y(:,3);
-% rc = (p(1)*w.^p(3))./(p(2)^p(3) + w.^p(3));
-% 
 % figure()
-% plot(t,rc)
+% hold on; box on;
+% plot(t,y(:,3),'Linewidth',2)
 % xlabel('Time (days)')
-% ylabel('Climax growth rate')
-% title('Climax growth rate')
+% ylabel('Oxygen (\muM)')
+% title('Oxygen')
 
 %%% Functions =============================================================
 
@@ -126,7 +133,8 @@ end
 
 %%% cf ode function
 function yp = cf_eqs(t,y,p)
-global k lambda t_c mu
+global k lambda t_c mu 
+global t_start t_end treat_true
 
 beta = p(3);
 r = p(4);
@@ -139,11 +147,24 @@ q = p(10);
 b = p(11);
 n = p(12);
 
-lambda = mu*p(1);
-
-if t >= t_c
-    ep = p(9);
+%%% check if we're treating and activate if we are
+% check if f > c, if so get start and end times
+if y(2)/(y(1) + y(2)) > 0.5
+    t_start = t;
+    t_end = t_start + 10;
 end
+
+% if current time is between start and end
+% use antibiotic
+if t_start <= t && t <= t_end
+    ep = p(9);
+else 
+    ep = 0;
+end
+% [t ep]
+% hold on
+% scatter(t,ep)
+
 
 %%% total death rates
 dc = dn + dbs;
@@ -156,7 +177,6 @@ x = y(3);
 yp = zeros(3,1);
 
 yp(1) = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - dc*c;
-% yp(2) = r*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
 yp(2) = (r + beta*(1 - x^n/(b^n + x^n)))*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
 yp(3) = lambda - mu*x - eta*(c)*x;
 

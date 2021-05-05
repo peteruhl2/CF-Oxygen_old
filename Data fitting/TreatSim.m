@@ -1,7 +1,7 @@
 %%% script for doing treatment simulations
 %%% 4/26/2020
 
-close all;
+% close all;
 
 data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
 tdata = data(:,1);
@@ -39,33 +39,24 @@ n = 2.6626;
 
 dn = 0.6045; % natural death rate
 dbs = 6.7686; % death due to bs antibiotics
-alpha = 0.8976; % fractional reduction of bs antibiotics in killing attack
+gamma = 0.8976; % fractional reduction of bs antibiotics in killing attack
 
 ep = 1.2124;
 mu = 200*23*60*24; % 1/5 min
 
 k = 10^10;
-eta = 3.1611e-4; % increased a bit for simulations
+eta = 12.5611e-4; % increased a bit for simulations
 q = 3.2747e-5;
 
 frac = 0.8659;
 
-lambda = mu*x0;
+% lambda = mu*x0;
+lambda = 9.6901e+07;
 
 p = [x0,frac,beta,r,...
-     eta,dbs,dn,alpha,...
+     eta,dbs,dn,gamma,...
      ep,q,b,n];
 
-
-A = []; b_opt = []; Aeq = []; Beq = [];
-lb = zeros(12,1);
-ub = [200 1.0 25 25 1e-3 10 10 1 1.5 1e-4 20 5];
-
-
-tic
-% [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
-% [p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
-toc
 
 %%% Treament simulation stuff in here =====================================
 t_start = Inf;
@@ -82,14 +73,32 @@ c0 = frac*N0;
 f0 = (1 - frac)*N0;
 
 y0 = [c0; f0; x0];
-tspan = [0 50];
+tspan = [0 80];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
 %%% relative abundances
 Ct = y(:,1)./(y(:,1) + y(:,2));
 Ft = y(:,2)./(y(:,1) + y(:,2));
 
-figure()
+%%% this stuff will find the time between exacerbations ===================
+%%% =======================================================================
+
+swtchpts = find(islocalmax(Ft)); % Ft local maxes
+swtimes = t(swtchpts); % times when Ft changes direction
+
+% get time between switches
+try
+    etime = swtimes(end) - swtimes(end-1)
+catch
+    % do nothing if error
+end
+
+
+
+
+%%% =======================================================================
+
+% figure()
 hold on; box on;
 plot(t,Ct,'Linewidth',2)
 plot(t,Ft,'Linewidth',2)
@@ -103,11 +112,12 @@ title('Climax and Attack Populations')
 % legend('C model','F model','C data','F data','Location','e')
 legend('C model','F model','Location','e')
 
-figure()
-plot(t,y(:,3),'Linewidth',2)
-xlabel('Time (days)')
-ylabel('Oxygen (\muM)')
-title('Oxygen')
+% figure()
+% hold on; box on;
+% plot(t,y(:,3),'Linewidth',2)
+% xlabel('Time (days)')
+% ylabel('Oxygen (\muM)')
+% title('Oxygen')
 
 %%% Functions =============================================================
 
@@ -131,19 +141,17 @@ r = p(4);
 eta = p(5);
 dbs = BrSpec(t,p);
 dn = p(7);
-alpha = p(8);
+gamma = p(8);
 ep = 0;
 q = p(10);
 b = p(11);
 n = p(12);
 
-lambda = mu*p(1);
-
 %%% check if we're treating and activate if we are
 % check if f > c, if so get start and end times
-if y(2)/(y(1) + y(2)) > 0.6
+if y(2)/(y(1) + y(2)) > 0.5
     t_start = t;
-    t_end = t_start + 4;
+    t_end = t_start + 10;
 end
 
 % if current time is between start and end
@@ -158,7 +166,7 @@ end
 
 %%% total death rates
 dc = dn + dbs;
-df = dn + alpha*dbs;
+df = dn + gamma*dbs;
 
 c = y(1);
 f = y(2);
