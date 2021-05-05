@@ -51,7 +51,7 @@ q = 3.2747e-5;
 frac = 0.8659;
 
 % lambda = mu*x0;
-lambda = 9.6901e+07*1.01;
+lambda = 9.6901e+07*1.0;
 
 p = [x0,frac,beta,r,...
      eta,dbs,dn,gamma,...
