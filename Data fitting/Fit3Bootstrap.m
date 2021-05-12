@@ -21,6 +21,7 @@ t_c = 33;
 %%% set up stuff for the bootstrap loop ===================================
 
 % set results for number of parameters
+runs = 100;
 n_params = 12;
 p_results = zeros(n_params,runs);
 
@@ -79,7 +80,6 @@ tspan = [0 40];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
 
-runs = 100;
 steps = length(t);
 C_results = zeros(steps,runs);
 F_results = zeros(steps,runs);

@@ -1,7 +1,7 @@
-%%% curve for lambda vs exacerbation time
-%%% 5/5/2020
+%%% curve of eta vs exacerbation time
+%%% 4/30/2020
 
-close all;
+% close all;
 
 data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
 tdata = data(:,1);
@@ -19,16 +19,17 @@ global k lambda t_b t_c N0 mu
 global t_start t_end treat_true
  
 N0 = 6.7e8;
-t_b = 19*Inf;
+t_b = 19*0;
 t_c = 33*Inf;
 
 %%% =======================================================================
 
 %%% do this simulation for a lot of eta values
-LambdaFrac = linspace(0.94,1.01,100)';
+Eta = linspace(1.5411e-4,8.3711e-4,100)';
 results = zeros(length(Eta),1);
 
-for i = 1:length(LambdaFrac)
+for i = 1:length(Eta)
+    i
     %%% initial oxygen
     x0 = 14.6287;
 
@@ -43,17 +44,17 @@ for i = 1:length(LambdaFrac)
     dbs = 6.7686; % death due to bs antibiotics
     gamma = 0.8976; % fractional reduction of bs antibiotics in killing attack
 
-    ep = 1.2124;
+    ep = 1.2124*1.0;
     mu = 200*23*60*24; % 1/5 min
 
     k = 10^10;
-    eta = 5.5611e-4; % increased a bit for simulations
+    eta = Eta(i); % increased a bit for simulations
     q = 3.2747e-5;
 
     frac = 0.8659;
 
     % lambda = mu*x0;
-    lambda = 9.6901e+07*LambdaFrac(i);
+    lambda = 9.6901e+07;
 
     p = [x0,frac,beta,r,...
          eta,dbs,dn,gamma,...
@@ -75,7 +76,7 @@ for i = 1:length(LambdaFrac)
     f0 = (1 - frac)*N0;
 
     y0 = [c0; f0; x0];
-    tspan = [0 80];
+    tspan = [0 180];
     [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
     %%% relative abundances
@@ -99,9 +100,9 @@ for i = 1:length(LambdaFrac)
     results(i) = etime;
 end
 
-figure()
+% figure()
 hold on; box on;
-plot(LambdaFrac,results,'LineWidth',2)
+plot(Eta,results,'LineWidth',2)
 xlabel('Oxygen consumption rate (micromole/day)')
 ylabel('Time between exacerbations (days)')
 
