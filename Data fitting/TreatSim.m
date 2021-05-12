@@ -98,18 +98,27 @@ end
 
 %%% =======================================================================
 
-% figure()
+% % figure()
+% hold on; box on;
+% plot(t,Ct,'Linewidth',2)
+% plot(t,Ft,'Linewidth',2)
+% % plot(tdata,cdata,'bx', 'LineWidth',2)
+% % plot(tdata,fdata,'rx', 'LineWidth',2)
+% xlabel('Time (days)')
+% ylabel('Relative Abundance')
+% title('Climax and Attack Populations')
+% % xline(t_b)
+% % xline(t_c)
+% % legend('C model','F model','C data','F data','Location','e')
+% legend('C model','F model','Location','e')
+
+figure()
 hold on; box on;
-plot(t,Ct,'Linewidth',2)
-plot(t,Ft,'Linewidth',2)
-% plot(tdata,cdata,'bx', 'LineWidth',2)
-% plot(tdata,fdata,'rx', 'LineWidth',2)
+plot(t,log10(y(:,1)),'Linewidth',2)
+plot(t,log10(y(:,2)),'Linewidth',2)
 xlabel('Time (days)')
-ylabel('Relative Abundance')
+ylabel('Absolute Abundance')
 title('Climax and Attack Populations')
-% xline(t_b)
-% xline(t_c)
-% legend('C model','F model','C data','F data','Location','e')
 legend('C model','F model','Location','e')
 
 % figure()

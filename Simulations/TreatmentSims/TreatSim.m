@@ -1,7 +1,7 @@
-%%% script for doing climax treatment simulations
-%%% 5/11/2020
+%%% script for doing treatment simulations
+%%% 4/26/2020
 
-close all;
+% close all;
 
 data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
 tdata = data(:,1);
@@ -19,7 +19,7 @@ global k lambda t_b t_c N0 mu
 global t_start t_end treat_true
  
 N0 = 6.7e8;
-t_b = 19*0;
+t_b = 19*Inf;
 t_c = 33*Inf;
 
 %%% =======================================================================
@@ -31,7 +31,6 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 x0 = 14.6287;
 
 % parameters to fit
-% r = 0.0046;
 r = 0.0046;
 
 beta = 16.6388; % try < 16
@@ -39,17 +38,15 @@ b = 13.4256;
 n = 2.6626;
 
 dn = 0.6045; % natural death rate
-dbs = 0.0686; % death due to bs antibiotics
-% gamma = 0.8976; % fractional reduction of bs antibiotics in killing attack
-gamma = 0.1;
+dbs = 6.7686; % death due to bs antibiotics
+gamma = 0.8976; % fractional reduction of bs antibiotics in killing attack
 
-ep = 0.01;
+ep = 1.2124;
 mu = 200*23*60*24; % 1/5 min
 
 k = 10^10;
-eta = 1.5911e-4; % increased a bit for simulations
-% q = 3.2747e-5;
-q = 1.1847e-3;
+eta = 12.5611e-4; % increased a bit for simulations
+q = 3.2747e-5;
 
 frac = 0.8659;
 
@@ -70,14 +67,13 @@ treat_true = 0;
 %%% =======================================================================
 
 % solve ode's
-tspan = [0 180];
-
 x0 = p(1);
 frac = p(2);
 c0 = frac*N0;
 f0 = (1 - frac)*N0;
 
 y0 = [c0; f0; x0];
+tspan = [0 80];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
 %%% relative abundances
@@ -103,34 +99,34 @@ end
 %%% =======================================================================
 
 % figure()
-% hold on; box on;
-% plot(t,Ct,'Linewidth',2)
-% plot(t,Ft,'Linewidth',2)
-% % plot(tdata,cdata,'bx', 'LineWidth',2)
-% % plot(tdata,fdata,'rx', 'LineWidth',2)
-% xlabel('Time (days)')
-% ylabel('Relative Abundance')
-% title('Climax and Attack Populations')
-% % xline(t_b)
-% % xline(t_c)
-% % legend('C model','F model','C data','F data','Location','e')
-% legend('C model','F model','Location','e')
-
-figure()
 hold on; box on;
-plot(t,log10(y(:,1)),'Linewidth',2)
-plot(t,log10(y(:,2)),'Linewidth',2)
+plot(t,Ct,'Linewidth',2)
+plot(t,Ft,'Linewidth',2)
+% plot(tdata,cdata,'bx', 'LineWidth',2)
+% plot(tdata,fdata,'rx', 'LineWidth',2)
 xlabel('Time (days)')
-ylabel('Absolute Abundance')
+ylabel('Relative Abundance')
 title('Climax and Attack Populations')
+% xline(t_b)
+% xline(t_c)
+% legend('C model','F model','C data','F data','Location','e')
 legend('C model','F model','Location','e')
 
-figure()
-hold on; box on;
-plot(t,y(:,3),'Linewidth',2)
-xlabel('Time (days)')
-ylabel('Oxygen (\muM)')
-title('Oxygen')
+% figure()
+% hold on; box on;
+% plot(t,log10(y(:,1)),'Linewidth',2)
+% plot(t,log10(y(:,2)),'Linewidth',2)
+% xlabel('Time (days)')
+% ylabel('Absolute Abundance')
+% title('Climax and Attack Populations')
+% legend('C model','F model','Location','e')
+
+% figure()
+% hold on; box on;
+% plot(t,y(:,3),'Linewidth',2)
+% xlabel('Time (days)')
+% ylabel('Oxygen (\muM)')
+% title('Oxygen')
 
 %%% Functions =============================================================
 
@@ -152,8 +148,7 @@ global t_start t_end treat_true
 beta = p(3);
 r = p(4);
 eta = p(5);
-% dbs = BrSpec(t,p);
-dbs = 0;
+dbs = BrSpec(t,p);
 dn = p(7);
 gamma = p(8);
 ep = 0;
@@ -171,17 +166,11 @@ end
 % if current time is between start and end
 % use antibiotic
 if t_start <= t && t <= t_end
-    dbs = p(6);
     ep = p(9);
 else 
     ep = 0;
-    dbs = 0;
 end
 % [t ep]
-% [t dbs]
-% hold on
-% scatter(t,ep,'b')
-% scatter(t,dbs,'r')
 
 
 %%% total death rates

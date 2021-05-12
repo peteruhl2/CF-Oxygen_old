@@ -32,24 +32,24 @@ x0 = 14.6287;
 
 % parameters to fit
 % r = 0.0046;
-r = 0.0046;
+r = 1.0046;
 
 beta = 16.6388; % try < 16
 b = 13.4256;
 n = 2.6626;
 
 dn = 0.6045; % natural death rate
-dbs = 0.0686; % death due to bs antibiotics
+dbs = 1.686; % death due to bs antibiotics
 % gamma = 0.8976; % fractional reduction of bs antibiotics in killing attack
-gamma = 0.1;
+gamma = 0.0;
 
-ep = 0.01;
+ep = 0.0;
 mu = 200*23*60*24; % 1/5 min
 
 k = 10^10;
-eta = 1.5911e-4; % increased a bit for simulations
+eta = 4.5911e-2; % increased a bit for simulations
 % q = 3.2747e-5;
-q = 1.1847e-3;
+q = 2.41847e-0;
 
 frac = 0.8659;
 
@@ -70,7 +70,7 @@ treat_true = 0;
 %%% =======================================================================
 
 % solve ode's
-tspan = [0 180];
+tspan = [0 20];
 
 x0 = p(1);
 frac = p(2);
@@ -102,19 +102,19 @@ end
 
 %%% =======================================================================
 
-% figure()
-% hold on; box on;
-% plot(t,Ct,'Linewidth',2)
-% plot(t,Ft,'Linewidth',2)
-% % plot(tdata,cdata,'bx', 'LineWidth',2)
-% % plot(tdata,fdata,'rx', 'LineWidth',2)
-% xlabel('Time (days)')
-% ylabel('Relative Abundance')
-% title('Climax and Attack Populations')
-% % xline(t_b)
-% % xline(t_c)
-% % legend('C model','F model','C data','F data','Location','e')
-% legend('C model','F model','Location','e')
+figure()
+hold on; box on;
+plot(t,Ct,'Linewidth',2)
+plot(t,Ft,'Linewidth',2)
+% plot(tdata,cdata,'bx', 'LineWidth',2)
+% plot(tdata,fdata,'rx', 'LineWidth',2)
+xlabel('Time (days)')
+ylabel('Relative Abundance')
+title('Climax and Attack Populations')
+% xline(t_b)
+% xline(t_c)
+% legend('C model','F model','C data','F data','Location','e')
+legend('C model','F model','Location','e')
 
 figure()
 hold on; box on;
@@ -179,10 +179,9 @@ else
 end
 % [t ep]
 % [t dbs]
-% hold on
+hold on
+scatter(t,dbs,'r')
 % scatter(t,ep,'b')
-% scatter(t,dbs,'r')
-
 
 %%% total death rates
 dc = dn + dbs;
@@ -203,53 +202,3 @@ yp(3) = lambda - mu*x - eta*(c)*x;
 % scatter(t,(r + beta*(1 - x^n/(b^n + x^n))),'rx')
 end
 
-%%% objective function for cf_fitter
-function J = cf_err(p,tdata,cdata,fdata)
-global N0 
-
-x0 = p(1);
-frac = p(2);
-
-c0 = frac*N0;
-f0 = (1 - frac)*N0;
-
-y0 = [c0; f0; x0];
-[t,y] = ode15s(@cf_eqs,tdata,y0,[],p);
-
-Ct = y(:,1)./(y(:,1) + y(:,2));
-Ft = y(:,2)./(y(:,1) + y(:,2));
-
-errx = Ct - cdata;
-erry = Ft - fdata;
-
-J = errx'*errx + erry'*erry;
-% J = errx'*errx;
-% J = erry'*erry;
-end
-
-%%% Function to return two error vectors (and ode solution in rel. abund.)
-function [sol,C_err,F_err] = err_vec(p,tdata,cdata,fdata)
-global N0
-% solve ode
-x0 = p(1);
-frac = p(2);
-
-c0 = frac*N0;
-f0 = (1 - frac)*N0;
-
-y0 = [c0; f0; x0];
-[t,y] = ode15s(@cf_eqs,tdata,y0,[],p);
-
-% return error vectors
-Ct = y(:,1)./(y(:,1) + y(:,2));
-Ft = y(:,2)./(y(:,1) + y(:,2));
-
-C_err = Ct - cdata;
-F_err = Ft - fdata;
-
-% return solution too
-sol = [t y];
-sol(:,2) = Ct;
-sol(:,3) = Ft;
-
-end
