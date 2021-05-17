@@ -47,7 +47,7 @@ ep = 0.0;
 mu = 200*23*60*24; % 1/5 min
 
 k = 10^10;
-eta = 7.634e-3; % increased a bit for simulations
+eta = 7.834e-3; % increased a bit for simulations
 % q = 3.2747e-5;
 q = 1.832e-0;
 

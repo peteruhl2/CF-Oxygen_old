@@ -1,7 +1,7 @@
 %%% script for doing treatment simulations
 %%% 4/26/2020
 
-close all;
+% close all;
 
 data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
 tdata = data(:,1);
@@ -41,14 +41,12 @@ dn = 0.6045; % natural death rate
 dbs = 6.7686; % death due to bs antibiotics
 gamma = 0.8976; % fractional reduction of bs antibiotics in killing attack
 
-ep = 1.2124*0;
+ep = 1.2124;
 mu = 200*23*60*24; % 1/5 min
 
 k = 10^10;
 eta = 12.5611e-4; % increased a bit for simulations
-% q = 3.2747e-5;
-q = 6.2747e-2;
-q = 1e-6;
+q = 3.2747e-5;
 
 frac = 0.8659;
 
@@ -71,12 +69,11 @@ treat_true = 0;
 % solve ode's
 x0 = p(1);
 frac = p(2);
-% c0 = frac*N0*1e-1;
-c0 = 1e-2*0;
+c0 = frac*N0;
 f0 = (1 - frac)*N0;
 
 y0 = [c0; f0; x0];
-tspan = [0 200];
+tspan = [0 20];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
 %%% relative abundances
@@ -115,14 +112,14 @@ title('Climax and Attack Populations')
 % legend('C model','F model','C data','F data','Location','e')
 legend('C model','F model','Location','e')
 
-figure()
-hold on; box on;
-plot(t,log10(y(:,1)),'Linewidth',2)
-plot(t,log10(y(:,2)),'Linewidth',2)
-xlabel('Time (days)')
-ylabel('Absolute Abundance')
-title('Climax and Attack Populations')
-legend('C model','F model','Location','e')
+% figure()
+% hold on; box on;
+% plot(t,log10(y(:,1)),'Linewidth',2)
+% plot(t,log10(y(:,2)),'Linewidth',2)
+% xlabel('Time (days)')
+% ylabel('Absolute Abundance')
+% title('Climax and Attack Populations')
+% legend('C model','F model','Location','e')
 
 figure()
 hold on; box on;
@@ -190,7 +187,7 @@ yp(1) = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - dc*c;
 yp(2) = (r + beta*(1 - x^n/(b^n + x^n)))*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
 yp(3) = lambda - mu*x - eta*(c)*x;
 
-% hold on
+hold on
 % scatter(t,(beta*x^n/(b^n + x^n)),'bo')
 % scatter(t,(r + beta*(1 - x^n/(b^n + x^n))),'rx')
 % scatter(t,(beta*x^n/(b^n + x^n))*(1 - (c + f)/k) - dc,'bo')
