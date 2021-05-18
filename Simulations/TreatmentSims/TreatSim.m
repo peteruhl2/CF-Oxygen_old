@@ -19,7 +19,7 @@ global k lambda t_b t_c N0 mu
 global t_start t_end treat_true
  
 N0 = 6.7e8;
-t_b = 19*Inf;
+t_b = 19*0;
 t_c = 33*Inf;
 
 %%% =======================================================================
@@ -41,19 +41,19 @@ dn = 0.6045; % natural death rate
 dbs = 6.7686; % death due to bs antibiotics
 gamma = 0.8976; % fractional reduction of bs antibiotics in killing attack
 
-ep = 1.2124*0;
+ep = 1.2124;
 mu = 200*23*60*24; % 1/5 min
 
 k = 10^10;
-eta = 12.5611e-4; % increased a bit for simulations
-% q = 3.2747e-5;
-q = 6.2747e-2;
-q = 1e-6;
+eta = 3.1611e-4; % increased a bit for simulations
+q = 3.2747e-5;
+% q = 6.2747e-2;
+% q = 1e-6;
 
 frac = 0.8659;
 
-% lambda = mu*x0;
-lambda = 9.6901e+07;
+lambda = mu*x0;
+% lambda = 9.6901e+07;
 
 p = [x0,frac,beta,r,...
      eta,dbs,dn,gamma,...
@@ -71,12 +71,12 @@ treat_true = 0;
 % solve ode's
 x0 = p(1);
 frac = p(2);
-% c0 = frac*N0*1e-1;
-c0 = 1e-2*0;
+c0 = frac*N0;
+% c0 = 1e-2*0;
 f0 = (1 - frac)*N0;
 
 y0 = [c0; f0; x0];
-tspan = [0 200];
+tspan = [0 40];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
 %%% relative abundances
@@ -179,6 +179,7 @@ end
 %%% total death rates
 dc = dn + dbs;
 df = dn + gamma*dbs;
+% [t dc df]
 
 c = y(1);
 f = y(2);
