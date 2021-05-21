@@ -9,20 +9,20 @@
 global k
 k = 10^10;
 
-beta = 12.1;
-r = 16.5;
-d = 0.2;
-q = k*0.001;
+beta = 18.1;
+r = 1.5;
+d = 0.8;
+q = k*1e-3;
 lambda = 9.7e7;
 mu = 200*23*60*24;
-eta = 2.2e-3;
+eta = 2.2e-4;
 
 p = [beta, r, d, q,...
      lambda, mu, eta];
 
 %%% ode stuff
-c0 = 0.8;
-f0 = 0.1;
+c0 = 0.6;
+f0 = 0.5;
 
 y0 = [c0; f0];
 tspan = [0 80];
@@ -79,4 +79,8 @@ yp = zeros(2,1);
 
 yp(1) = (beta*lambda/(mu + eta*c))*c*(1 - c - f) - dc*c;
 yp(2) = r*(k*f*(mu + eta*c)/(q*lambda) - 1)*f*(1 - c - f) - df*f;
+
+hold on
+scatter(t,(beta*lambda/(mu + eta*c))*(1 - c - f) - dc,'b')
+scatter(t,r*(k*f*(mu + eta*c)/(q*lambda) - 1)*(1 - c - f) - df,'r')
 end

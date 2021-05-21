@@ -17,26 +17,26 @@ k = 10^10;
 
 %%% Ode parameters ========================================================
 
-beta = 19.3;
-r = 0;
-d = 0.01;
-q = 16.2e-3;
+beta = 14.3;
+r = 18;
+d = 0.6;
+q = 16.2e-5;
 
 lambda = 9.7e7;
 mu = 200*23*60*24;
-eta = 2.2e-8;
-b = 13.6;
+eta = 2.2e-4;
+b = 12.4;
 
 p = [beta,r,d,q,...
      lambda,mu,eta,b];
 
 frac = 0.85;
 c0 = frac*N0*5;
-f0 = (1 - frac)*N0*rand();
+f0 = (1 - frac)*N0*rand()*100;
 x0 = 14;
 y0 = [c0; f0; x0];
 
-tspan = [0 360];
+tspan = [0 600];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
 
@@ -74,9 +74,6 @@ Jf = @(c,f) A(c)*(1-c/k) - 2*A(c)*f/k - d - q*lambda/(mu + eta*c);
 % square root terms
 rad1 = sqrt(d + 4*b*q)/sqrt(d);
 rad2 = sqrt(d)*sqrt(d+4*b*q);
-
-% Jf0(c(end)) < 0 & Jf(c(end),f(end)) < 0
-% Jf(c(end),f(end));
 
 %%% exclusion values
 cx = (-d*k*lambda +k*beta*lambda - b*d*k*mu)/(b*d*k*eta + beta*lambda);
@@ -130,6 +127,7 @@ yp = zeros(3,1);
 
 yp(1) = (beta*x/(b + x))*c*(1 - (c + f)/k) - dc*c;
 yp(2) = (beta*(1 - x/(b + x)))*f*(1 - (c + f)/k) - df*f  - q*x*f;
+% yp(2) = (r*(1 - x/(b + x)))*f*(1 - (c + f)/k) - df*f  - q*x*f;
 yp(3) = lambda - mu*x - eta*x*c;
 
 % hold on
