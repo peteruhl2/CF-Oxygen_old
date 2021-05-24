@@ -1,5 +1,12 @@
 %%% Program to compute 95% confidence intervals for the CF ode model
 %%% by bootstrapping the erros
+
+%%% model fit is 
+
+% C' = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - dc*c;
+% F' = (r + beta*(1 - x^n/(b^n + x^n)))*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
+% X' = lambda - mu*x - eta*(c)*x;
+
 %%% 3/10/21
 
 close all;

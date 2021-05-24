@@ -62,7 +62,7 @@ ub = [200 1.0 25 25 1e-3 10 10 1 1.5 1e-4 20 5];
 
 tic
 % [p,fval,flag,output] = fminsearch(@cf_err,p,options,tdata,cdata,fdata);
-% [p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
+[p,fval,flag,output] = fmincon(@cf_err,p,A,b_opt,Aeq,Beq,lb,ub,[],options,tdata,cdata,fdata);
 toc
 
 % solve ode's
