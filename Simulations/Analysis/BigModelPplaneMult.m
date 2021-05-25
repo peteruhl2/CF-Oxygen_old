@@ -12,17 +12,17 @@
 %%% this one is multiple trajectories
 %%% 5/23/21
 
-% close all;
+close all;
 
 %%% Parameters ============================================================
 global k beta r d b mu eta lambda q n
 k = 10^10;
 
 beta = 16.6;
-r = 0.004;
-d = 1.6;
+r = 0.4;
+d = 0.6;
 b = 13.4;
-n = 1.6;
+n = 2.6;
 
 mu = 200*23*60*24;
 eta = 3.1e-3;
@@ -36,11 +36,8 @@ rc = @(c) (beta*lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n);
 rf = @(c) (r + beta*(1 - (lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n)));
 
 %%% nullcline functions
-% Cp = @(c,f) rc(c).*(1-c-f) - d;
-% Fp = @(c,f) rf(c).*(1-c-f) - d - q*lambda./(mu + eta*k*c);
 Cp = @(c,f) (beta*lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n).*(1-c-f) - d;
 Fp = @(c,f) (r + beta*(1 - (lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n))).*(1-c-f) - d - q*lambda./(mu + eta*k*c);
-
 
 %%% ODE solver ============================================================
 %%% ode stuff
@@ -98,8 +95,6 @@ ylim([0 1])
 
 
 
-
-
 %%% functions =============================================================
 
 %%% cf ode function
@@ -117,4 +112,16 @@ yp(2) = (r + beta*(1 - (lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n))).*f*(1-
 % hold on
 % scatter(t,(beta*lambda/(mu + eta*c))*(1 - c - f) - dc,'b')
 % scatter(t,r*(k*f*(mu + eta*c)/(q*lambda) - 1)*(1 - c - f) - df,'r')
+end
+
+%%% steady state residual function
+function F = SStates(x)
+global k beta r d b mu eta lambda q n
+
+c = x(1);
+f = x(2);
+
+F(1) = (beta*lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n).*c*(1-c-f) - d*c;
+F(2) = (r + beta*(1 - (lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n))).*f*(1-c-f) - d*f - q*lambda*f./(mu + eta*k*c);
+
 end

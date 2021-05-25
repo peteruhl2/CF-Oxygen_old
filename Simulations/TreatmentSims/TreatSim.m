@@ -52,7 +52,7 @@ q = 3.2747e-5;
 
 frac = 0.8659;
 
-lambda = mu*x0*2;
+lambda = mu*x0*1;
 % lambda = 9.6901e+07;
 
 p = [x0,frac,beta,r,...
