@@ -19,7 +19,7 @@ global k beta r d b mu eta lambda q n
 k = 10^10;
 
 beta = 16.6;
-r = 0.4;
+r = 0.004;
 d = 0.6;
 b = 13.4;
 n = 2.6;
@@ -28,7 +28,7 @@ mu = 200*23*60*24;
 eta = 3.1e-3;
 
 lambda = 9.2e7;
-q = 3e-1;
+q = 3e-2;
 
 %%% =======================================================================
 %%% growth rates
@@ -47,7 +47,7 @@ f0 = 0.001;
 y0 = [c0; f0];
 tspan = [0 800];
 
-[t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
+[t, y] = ode15s(@(t,y) cf_eqs(t,y), tspan, y0);
 
 
 
@@ -65,7 +65,7 @@ for i = 1:runs
     y0 = [c0; f0];
 
     tspan = [0 600];
-    [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
+    [t, y] = ode15s(@(t,y) cf_eqs(t,y), tspan, y0);
 
     hold on; box on;
     plot((y(:,1)),(y(:,2)),'-.','Linewidth',1.5)
@@ -98,7 +98,7 @@ ylim([0 1])
 %%% functions =============================================================
 
 %%% cf ode function
-function yp = cf_eqs(t,y,p)
+function yp = cf_eqs(t,y)
 global k beta r d b mu eta lambda q n
 
 c = y(1);
