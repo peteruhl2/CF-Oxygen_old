@@ -12,7 +12,7 @@
 %%% this one is multiple trajectories
 %%% 5/23/21
 
-close all;
+% close all;
 
 %%% Parameters ============================================================
 global k beta r d b mu eta lambda q n
@@ -27,8 +27,8 @@ n = 2.6;
 mu = 200*23*60*24;
 eta = 3.1e-3;
 
-lambda = 9.2e7;
-q = 3e-2;
+lambda = 9.6e7;
+q = 3e-1;
 
 %%% =======================================================================
 %%% growth rates
@@ -58,31 +58,39 @@ tspan = [0 800];
 
 runs = 50;
 
-for i = 1:runs
-    i
-    c0 = unifrnd(0,1);
-    f0 = unifrnd(0,1);
-    y0 = [c0; f0];
-
-    tspan = [0 600];
-    [t, y] = ode15s(@(t,y) cf_eqs(t,y), tspan, y0);
-
-    hold on; box on;
-    plot((y(:,1)),(y(:,2)),'-.','Linewidth',1.5)
-    scatter((y(end,1)),(y(end,2)),'Linewidth',2)
-    xlabel('C')
-    ylabel('F')
-end
+% for i = 1:runs
+%     i
+%     c0 = unifrnd(0,1);
+%     f0 = unifrnd(0,1);
+%     y0 = [c0; f0];
+% 
+%     tspan = [0 600];
+%     [t, y] = ode15s(@(t,y) cf_eqs(t,y), tspan, y0);
+% 
+%     hold on; box on;
+%     plot((y(:,1)),(y(:,2)),'-.','Linewidth',1.5)
+%     scatter((y(end,1)),(y(end,2)),'Linewidth',2)
+%     xlabel('C')
+%     ylabel('F')
+% end
 %%% =======================================================================
 
 % time series
 c = y(:,1);
 f = y(:,2);
 
+x = [c(end),f(end)];
+v = cfeigs(x)
+
+
+
+
 interval = [0,1];
 hold on
-fimplicit(Cp, interval,'b','Linewidth',2)
-fimplicit(Fp, interval,'r','Linewidth',2)
+% fimplicit(Cp, interval,'b','Linewidth',2)
+% fimplicit(Fp, interval,'r','Linewidth',2)
+fimplicit(Cp, interval,'Linewidth',2)
+fimplicit(Fp, interval,'Linewidth',2)
 xlabel('C')
 ylabel('F')
 
@@ -123,5 +131,29 @@ f = x(2);
 
 F(1) = (beta*lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n).*c*(1-c-f) - d*c;
 F(2) = (r + beta*(1 - (lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n))).*f*(1-c-f) - d*f - q*lambda*f./(mu + eta*k*c);
+
+end
+
+%%% function that returns eigenvalues of a point (c,f)
+function v = cfeigs(x)
+global k beta r d b mu eta lambda q n
+
+c = x(1);
+f = x(2);
+
+%%% big terms
+A = (c*k*eta + mu);
+B = (lambda^n)/(lambda^n + b^n*A^n);
+D = (b^n)*(1-c-f)*k*n*beta*eta*(lambda^n)*(A^(n-1))/((lambda^n + (b^n)*A^n)^2);
+
+
+J = zeros(2,2);
+
+J(1,1) = -d - c*D - c*beta*B + (1-c-f)*beta*B;
+J(1,2) = -c*beta*B;
+J(2,1) = f*k*q*eta*lambda/(A^2) + f*D - f*(r + beta*(1-B));
+J(2,2) = -d - q*lambda/A + (1-c-f)*(r + beta*(1-B)) - f*(r + beta*(1-B));
+
+v = eigs(J);
 
 end

@@ -1,6 +1,5 @@
-%%% using this to look at transient properites of the best fitting
-%%% parameters and look at the levels for the coexistence equilibrium
-%%% model is
+%%% this solves the model with different oxygen to see how long it takes f
+%%% to get to 0.5 relative abundance
 
 % C' = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - dc*c;
 % F' = (r + beta*(1 - x^n/(b^n + x^n)))*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
@@ -10,13 +9,6 @@
 %%% 4/26/2020
 
 close all;
-
-data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
-tdata = data(:,1);
-% cdata = data(:,2)/100;
-% fdata = data(:,3)/100;
-cdata = data(:,2);
-fdata = data(:,3);
 
 %%% =======================================================================
 
@@ -31,72 +23,83 @@ t_b = 19*0;
 t_c = 33*Inf;
 
 %%% =======================================================================
-%%% initial oxygen
-x0 = 14.6287;
+lambdaFrac = linspace(0.8,1.115);
+results = zeros(length(lambdaFrac),1);
 
-% parameters
-r = 0.0046;
+for i = 1:length(lambdaFrac)
+    %%% initial oxygen
+    x0 = 14.6287;
 
-beta = 16.6388;
-b = 13.4256;
-n = 2.6626;
+    % parameters
+    r = 0.0046;
 
-dn = 0.6045; % natural death rate
-dbs = 6.7686; % death due to bs antibiotics
-gamma = 0.8976; % fractional reduction of bs antibiotics in killing attack
+    beta = 16.6388;
+    b = 13.4256;
+    n = 2.6626;
 
-ep = 1.2124;
-mu = 200*23*60*24; % 1/5 min
+    dn = 0.6045; % natural death rate
+    dbs = 6.7686; % death due to bs antibiotics
+    gamma = 0.8976; % fractional reduction of bs antibiotics in killing attack
 
-k = 10^10;
-eta = 3.1611e-4; 
-q = 3.2747e-5;
+    ep = 1.2124;
+    mu = 200*23*60*24; % 1/5 min
 
-frac = 0.8659;
+    k = 10^10;
+    eta = 3.1611e-4; 
+    q = 3.2747e-5;
 
-lambda = mu*x0;
-% lambda = 9.6901e+07;
+    frac = 0.8659;
 
-p = [x0,frac,beta,r,...
-     eta,dbs,dn,gamma,...
-     ep,q,b,n];
+    % lambda = mu*x0*0.77;
+    lambda = mu*x0*lambdaFrac(i);
+
+    p = [x0,frac,beta,r,...
+         eta,dbs,dn,gamma,...
+         ep,q,b,n];
 
 
-%%% Treament simulation stuff in here =====================================
-t_start = Inf;
-t_end = Inf;
-treat_true = 0;
+    %%% Treament simulation stuff in here =====================================
+    t_start = Inf;
+    t_end = Inf;
+    treat_true = 0;
 
+
+    %%% =======================================================================
+
+    % solve ode's
+    x0 = p(1);
+    frac = p(2);
+    c0 = frac*N0;
+    % c0 = 1e-2*0;
+    f0 = (1 - frac)*N0;
+
+    y0 = [c0; f0; x0];
+    tspan = [0:0.01:40];
+    [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
+
+    %%% relative abundances
+    Ct = y(:,1)./(y(:,1) + y(:,2));
+    Ft = y(:,2)./(y(:,1) + y(:,2));
+
+    %%% this stuff will find the time between exacerbations ===================
+    %%% =======================================================================
+
+    tol = 5e-1;
+
+%     swtchpts = find(abs(Ft - Ct) < tol); % find point where they switch
+    swtchpts = find(Ft>Ct);
+    swtimes = t(swtchpts); % time when they switch
+
+    results(i) = swtimes(1);
+end
 
 %%% =======================================================================
 
-% solve ode's
-x0 = p(1);
-frac = p(2);
-c0 = frac*N0;
-% c0 = 1e-2*0;
-f0 = (1 - frac)*N0;
-
-y0 = [c0; f0; x0];
-tspan = [0 40];
-[t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
-
-%%% relative abundances
-Ct = y(:,1)./(y(:,1) + y(:,2));
-Ft = y(:,2)./(y(:,1) + y(:,2));
-
-%%% this stuff will find the time between exacerbations ===================
-%%% =======================================================================
-
-tol = 1e-2;
-
-swtchpts = find(abs(Ft - Ct) < tol); % find point where they switch
-swtimes = t(swtchpts) % time when they switch
-
-
-
-
-%%% =======================================================================
+figure()
+hold on; box on;
+plot(lambdaFrac,results, 'LineWidth',2)
+xlabel('Oxygen inflow rate (% of normal)')
+ylabel('Days to population switch')
 
 figure()
 hold on; box on;
@@ -112,14 +115,14 @@ title('Climax and Attack Populations')
 % legend('C model','F model','C data','F data','Location','e')
 legend('C model','F model','Location','e')
 
-figure()
-hold on; box on;
-plot(t,log10(y(:,1)),'Linewidth',2)
-plot(t,log10(y(:,2)),'Linewidth',2)
-xlabel('Time (days)')
-ylabel('Absolute Abundance')
-title('Climax and Attack Populations')
-legend('C model','F model','Location','e')
+% figure()
+% hold on; box on;
+% plot(t,log10(y(:,1)),'Linewidth',2)
+% plot(t,log10(y(:,2)),'Linewidth',2)
+% xlabel('Time (days)')
+% ylabel('Absolute Abundance')
+% title('Climax and Attack Populations')
+% legend('C model','F model','Location','e')
 
 % figure()
 % hold on; box on;
