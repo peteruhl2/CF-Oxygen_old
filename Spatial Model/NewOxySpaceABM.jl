@@ -225,22 +225,6 @@ while (true)
     dc = get_dc(t)
     df = get_df(t,w)
 
-    # broadspectrum term
-    # if t < t_b
-    #     dc = dn + dbs
-    #     df = dn + γ*dbs + q*w
-    # else
-    #     dc = dn
-    #     df = dn + q*w
-    # end
-    #
-    # # clindamycin term
-    # if t > t_c
-    #     df = dn + q*w
-    # else
-    #     df = dn + q*w + ϵ
-    # end
-
     ### this will be stuff for the oxygen ode
     # count c's for ode
     C_tot = 0
@@ -320,11 +304,24 @@ while (true)
         if D[j] == 2 f += 1 end
     end
 
-    # this does the movie
+    ### this does the movie ===================================================#
+    BS = "Broad-spectrum antibiotics"
+    Clin = "Antibiotics targeting attack"
+    title = "No treatment"
+
+    # set title
+    if t < t_b
+        title = BS
+    end
+    if t > t_c
+        title = Clin 
+    end
     if t%1 == 0
-        p = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
+        p = heatmap(D[:,:,1],title = title,legend=true,clims=(0,2))
         display(p)
     end
+    ### end of movie stuff ====================================================#
+
 
     # update populations
     pop = c + f
