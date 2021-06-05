@@ -71,8 +71,8 @@ for i = 1:length(Beta)
     Epts(i,:) = xco;
     V(i,:) = cfeigs(xco);
     
-%     fimplicit(Cp, interval,'b','Linewidth',2)
-%     fimplicit(Fp, interval,'r','Linewidth',2)
+    fimplicit(Cp, interval,'b','Linewidth',2)
+    fimplicit(Fp, interval,'r','Linewidth',2)
     
     if max(V(i,:)) > 0 % unstable
         scatter(xco(1),xco(2),'kx','Linewidth',4)
