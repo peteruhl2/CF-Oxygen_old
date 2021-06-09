@@ -16,11 +16,16 @@ close all;
 global k beta r d b mu eta lambda q n
 
 %%% array for results =====================================================
-res = 100;
+res = 200;
 N = linspace(0.1,10,res);
 B = linspace(0,30,res);
 Fvals = zeros(length(N),length(B));
 % V = zeros(length(N), 2);
+
+%%% for the isocline at F(x,y) = 0.5
+tol = 5e-3;
+Niso = [];
+Biso = [];
 
 options = optimset('Display','off');
 fun = @SStates;
@@ -77,6 +82,13 @@ for i = 1:length(N)
         Fvals(i,j) = xco(2);
 %         V(i,:) = cfeigs(xco);
 
+
+        %%% get values for isocline
+        if abs(xco(2) - 0.5) < tol
+            Niso = [Niso n];
+            Biso = [Biso b];
+        end
+
     %     fimplicit(Cp, interval,'b','Linewidth',2)
     %     fimplicit(Fp, interval,'r','Linewidth',2)
 
@@ -118,12 +130,15 @@ f = y(:,2);
 
 [X,Y] = meshgrid(N,B);
 hold on; box on;
-surf(X,Y,Fvals')
-xlabel('n')
-ylabel('b')
-h = colorbar;
-ylabel(h, 'F equilibrium value')
+% surf(X,Y,Fvals')
+contourf(X,Y,Fvals')
+h1 = plot3(smooth(Niso),smooth(Biso),ones(length(Niso),1),'k','Linewidth',2);
+xlabel('Slope factor - n')
+ylabel('Half-saturation constant - b')
+h2 = colorbar;
+ylabel(h2, 'F equilibrium value')
 shading interp
+legend ([h1],'F = 0.5')
 
 
 %%% functions =============================================================

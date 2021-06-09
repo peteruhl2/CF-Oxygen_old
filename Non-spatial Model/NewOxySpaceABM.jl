@@ -307,23 +307,23 @@ while (true)
         if D[j] == 2 f += 1 end
     end
 
-    ### this does the movie ===================================================#
-    BS = "Broad-spectrum antibiotics"
-    Clin = "Antibiotics targeting attack"
-    title = "No treatment"
-
-    # set title
-    if t < t_b
-        title = BS
-    end
-    if t > t_c
-        title = Clin
-    end
-    if t%1 == 0
-        p = heatmap(D[:,:,1],title = title,legend=true,clims=(0,2))
-        display(p)
-    end
-    ### end of movie stuff ====================================================#
+    # ### this does the movie ===================================================#
+    # BS = "Broad-spectrum antibiotics"
+    # Clin = "Antibiotics targeting attack"
+    # title = "No treatment"
+    #
+    # # set title
+    # if t < t_b
+    #     title = BS
+    # end
+    # if t > t_c
+    #     title = Clin
+    # end
+    # if t%1 == 0
+    #     p = heatmap(D[:,:,1],title = title,legend=true,clims=(0,2))
+    #     display(p)
+    # end
+    # ### end of movie stuff ====================================================#
 
 
     # update populations

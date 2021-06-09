@@ -29,7 +29,7 @@ options = optimset('MaxFunEvals',5000,'Display','iter');
 x0 = 14.6287;
 
 % parameters to fit
-r = 0.0046*0;
+r = 0.0046;
 
 beta = 16.6388; % try < 16
 b = 13.4256;
@@ -155,9 +155,12 @@ x = y(3);
 
 yp = zeros(3,1);
 
-yp(1) = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - dc*c;
+%%% old as of 6/2, 2021
+% yp(1) = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - dc*c;
 % yp(2) = r*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
-yp(2) = (r + beta*(1 - x^n/(b^n + x^n)))*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
+
+yp(1) = (beta*x^n/(b^n + x^n) + r)*c*(1 - (c + f)/k) - dc*c;
+yp(2) = (beta*(1 - x^n/(b^n + x^n)))*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
 yp(3) = lambda - mu*x - eta*(c)*x;
 
 % hold on

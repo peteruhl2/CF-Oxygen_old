@@ -1,4 +1,5 @@
-%%% make a surface of the equilibrium value of f for a big range of n and b
+%%% make a surface of the equilibrium value of f for a big range of q and
+%%% eta
 
 %%% in this r_c(X) = beta*x^n/(b^n + x^n)
 %%% model is
@@ -9,17 +10,22 @@
 %%% rc = (beta*lambda^n)/(lambda^n + b^n*(mu + eta*k*c)^n)
 %%% rf = (r + beta*(1 - (lambda^n)/(lambda^n + b^n*(mu + eta*k*c)^n)))
 
-%%% this one is multiple trajectories
-%%% 6/4/2021
+%%% 6/8/2021
 
 close all;
 global k beta r d b mu eta lambda q n
 
 %%% array for results =====================================================
-N = linspace(0.1,5,100);
-B = linspace(0,30,100);
-Fvals = zeros(length(N),length(B));
+res = 60;
+Q = linspace(3e-5,2,res);
+Eta = 10.^linspace(-4,-2,res);
+Fvals = zeros(length(Q),length(Eta));
 % V = zeros(length(N), 2);
+
+%%% for the isocline at F(x,y) = 0.5
+tol = 5e-3;
+Qiso = [];
+Etaiso = [];
 
 options = optimset('Display','off');
 fun = @SStates;
@@ -51,11 +57,13 @@ Fp = @(c,f) (r + beta*(1 - (lambda^n)./(lambda^n + (b^n)*(mu + eta*k*c).^n))).*(
 
 
 % hold on
-for i = 1:length(N)
-    for j = 1:length(B)
+for i = 1:length(Q)
+    for j = 1:length(Eta)
+        [i j]
+        
         %%% new value of n and b
-        n = N(i);
-        b = B(j);
+        q = Q(i);
+        eta = Eta(j);
 
         %%% have to bring the nullcline functions in here
         %%% growth rates
@@ -73,6 +81,13 @@ for i = 1:length(N)
         %%% get F equilibrium value, F is second component
         Fvals(i,j) = xco(2);
 %         V(i,:) = cfeigs(xco);
+
+
+        %%% get values for isocline
+        if abs(xco(2) - 0.5) < tol
+            Qiso = [Qiso q];
+            Etaiso = [Etaiso eta];
+        end
 
     %     fimplicit(Cp, interval,'b','Linewidth',2)
     %     fimplicit(Fp, interval,'r','Linewidth',2)
@@ -113,59 +128,18 @@ f = y(:,2);
 
 %%% plots =================================================================
 
-% %%% plot null clines
-% interval = [0,1];
-% hold on; box on;
-% fimplicit(Cp, interval,'b','Linewidth',2)
-% fimplicit(Fp, interval,'r','Linewidth',2)
-% xlabel('C')
-% ylabel('F')
-% 
-% %%% plot path of eq point
-% figure()
-% hold on; box on;
-% plot(Fvals(:,1),Fvals(:,2),'Linewidth',2)
-% xlabel('C')
-% ylabel('F')
-% xlim([0 1])
-% ylim([0 1])
-% % plot(c,f,'-.','Linewidth',2)
-% % scatter(c(end),f(end),'kx','Linewidth',2)
-% title('Path of equilibrium point for 0 < n < 100')
-% 
-% %%% equilib population values as function of d
-% figure()
-% hold on; box on;
-% plot(N,Fvals(:,1),'Linewidth',2)
-% plot(N,Fvals(:,2),'Linewidth',2)
-% xlabel('b')
-% ylabel('Scaled populations at equilibrium')
-% legend('C','F')
-% title('Equilbrium values as function of slope factor (n))')
-% 
-% 
-% 
-% %%% test line changing color
-% xx = Fvals(:,1);
-% yy = Fvals(:,2);
-% 
-% figure()
-% clf
-% % Color changes along x axis
-% % sp(1) = subplot(3,1,1);
-% % col = [xx(1:end-1)', NaN]; % Must end in NaN to filling a solid
-% col = [N(1:end-1), NaN]; % Must end in NaN to filling a solid
-% patch(xx,yy,col, 'EdgeColor', 'interp', 'LineWidth', 3)
-% axis tight
-% box on
-% grid on
-% title('Path of equilibrium point for 0 < n < 100')
-% xlim([0 1])
-% ylim([0 1])
-% xlabel('C')
-% ylabel('F')
-% h = colorbar;
-% ylabel(h, 'n')
+[X,Y] = meshgrid(Q,Eta);
+hold on; box on;
+% surf(X,Y,Fvals')
+contourf(X,Y,Fvals')
+h1 = plot3(smooth(Qiso),smooth(Etaiso),ones(length(Qiso),1),'k','Linewidth',2);
+xlabel('Oxygen toxicity rate - q')
+ylabel('Oxygen consumption rate - \eta')
+h2 = colorbar;
+ylabel(h2, 'F equilibrium value')
+shading interp
+legend ([h1],'F = 0.5')
+
 
 %%% functions =============================================================
 

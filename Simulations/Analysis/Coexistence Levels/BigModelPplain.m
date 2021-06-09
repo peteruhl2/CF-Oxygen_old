@@ -58,17 +58,21 @@ f = y(:,2);
 %%% plots =================================================================
 interval = [0,1];
 
-hold on
+hold on; box on
 fimplicit(Cp, interval,'b','Linewidth',2)
 fimplicit(Fp, interval,'r','Linewidth',2)
 xlabel('C')
 ylabel('F')
+% legend('Cp = 0','Fp = 0','Coexistence equilibrium','F only equilibrium','C only equilibrium')
 
 %%% ode lines
-plot(c,f,'-.','Linewidth',2)
+% plot(c,f,'-.','Linewidth',2)
 scatter(c(end),f(end),'kx','Linewidth',4)
 
-
+%%% hard coded exclusion points
+scatter(0,0.7994,'rx','Linewidth',4)
+scatter(0.2863,0,'bx','Linewidth',4)
+legend('Cp = 0','Fp = 0','Coexistence equilibrium','F only equilibrium','C only equilibrium')
 
 
 

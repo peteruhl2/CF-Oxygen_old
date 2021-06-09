@@ -37,7 +37,7 @@ x0 = 14.6287;
 % parameters
 r = 0.0046;
 
-beta = 26.6388;
+beta = 16.6388;
 b = 13.4256;
 n = 2.6626;
 
@@ -78,7 +78,7 @@ c0 = frac*N0;
 f0 = (1 - frac)*N0;
 
 y0 = [c0; f0; x0];
-tspan = [0 40];
+tspan = [0:0.01:50];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
 %%% relative abundances
@@ -93,8 +93,12 @@ tol = 1e-2;
 % swtchpts = find(abs(Ft - Ct) < tol); % find point where they switch
 % swtimes = t(swtchpts) % time when they switch
 
-swtchpts
-
+try
+    swtchpts = find(Ft > Ct);
+    swtimes = t(swtchpts(1))
+catch
+    % do nothing if error
+end
 
 
 
