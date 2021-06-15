@@ -1,6 +1,6 @@
-%%% using this to look at transient properites of the best fitting
-%%% parameters and look at the levels for the coexistence equilibrium
-%%% model is
+%%% find the switch times for different ranges of parameters
+%%% this one a surface for q and eta
+%%% to get to 0.5 relative abundance
 
 % C' = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - dc*c;
 % F' = (r + beta*(1 - x^n/(b^n + x^n)))*f*(1 - (f + c)/k) - df*f - ep*f - q*f*x;
@@ -10,13 +10,6 @@
 %%% 4/26/2020
 
 close all;
-
-data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
-tdata = data(:,1);
-% cdata = data(:,2)/100;
-% fdata = data(:,3)/100;
-cdata = data(:,2);
-fdata = data(:,3);
 
 %%% =======================================================================
 
@@ -31,6 +24,13 @@ t_b = 19*0;
 t_c = 33*Inf;
 
 %%% =======================================================================
+res = 20;
+
+Q = linspace(1e-5,5e-2,res);
+Eta = linspace(1e-4,1e-3,res);
+results = zeros(length(Q),length(Eta));
+
+%%% parameters
 %%% initial oxygen
 x0 = 14.6287;
 
@@ -55,54 +55,72 @@ q = 3.2747e-5;
 frac = 0.8659;
 
 lambda = mu*x0;
-% lambda = 11.6901e+07;
 
-p = [x0,frac,beta,r,...
-     eta,dbs,dn,gamma,...
-     ep,q,b,n];
+for i = 1:length(Q)
+    for j = 1:length(Eta)
+        [i j] 
+        
+        q = Q(i);
+        eta = Eta(j);
 
+        p = [x0,frac,beta,r,...
+             eta,dbs,dn,gamma,...
+             ep,q,b,n];
 
-%%% Treament simulation stuff in here =====================================
-t_start = Inf;
-t_end = Inf;
-treat_true = 0;
+        %%% Treament simulation stuff in here =====================================
+        t_start = Inf;
+        t_end = Inf;
+        treat_true = 0;
 
+        %%% =======================================================================
 
-%%% =======================================================================
+        % solve ode's
+        x0 = p(1);
+        frac = p(2);
+        c0 = frac*N0;
+        % c0 = 1e-2*0;
+        f0 = (1 - frac)*N0;
 
-% solve ode's
-x0 = p(1);
-frac = p(2);
-c0 = frac*N0;
-% c0 = 1e-2*0;
-f0 = (1 - frac)*N0;
+        y0 = [c0; f0; x0];
+        tspan = [0:0.01:60];
+        [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
-y0 = [c0; f0; x0];
-tspan = [0:0.01:50];
-[t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
+        %%% relative abundances
+        Ct = y(:,1)./(y(:,1) + y(:,2));
+        Ft = y(:,2)./(y(:,1) + y(:,2));
 
-%%% relative abundances
-Ct = y(:,1)./(y(:,1) + y(:,2));
-Ft = y(:,2)./(y(:,1) + y(:,2));
+        %%% this stuff will find the time between exacerbations ===================
+        %%% =======================================================================
 
-%%% this stuff will find the time between exacerbations ===================
-%%% =======================================================================
+        tol = 5e-1;
 
-tol = 1e-2;
+    %     swtchpts = find(abs(Ft - Ct) < tol); % find point where they switch
 
-% swtchpts = find(abs(Ft - Ct) < tol); % find point where they switch
-% swtimes = t(swtchpts) % time when they switch
+        try
+            swtchpts = find(Ft>Ct);
+            swtimes = t(swtchpts); % time when they switch
 
-try
-    swtchpts = find(Ft > Ct);
-    swtimes = t(swtchpts(1))
-catch
-    % do nothing if error
+            results(i,j) = swtimes(1);
+        catch
+            results(i,j) = NaN;
+        end
+    end
 end
 
-
-
 %%% =======================================================================
+
+[X,Y] = meshgrid(Q,Eta);
+
+hold on; box on;
+% surf(X,Y,Fvals')
+contourf(X,Y,results')
+xlabel('Oxygen toxicity rate - q')
+ylabel('Oxygen consumption rate - \eta')
+h2 = colorbar;
+ylabel(h2, 'Days to population switch')
+shading interp
+
+
 
 figure()
 hold on; box on;
@@ -113,26 +131,10 @@ plot(t,Ft,'Linewidth',2)
 xlabel('Time (days)')
 ylabel('Relative Abundance')
 title('Climax and Attack Populations')
-xline(swtimes)
+% xline(t_b)
 % xline(t_c)
 % legend('C model','F model','C data','F data','Location','e')
-legend('C model','F model','Population switch','Location','e')
-
-figure()
-hold on; box on;
-plot(t,log10(y(:,1)),'Linewidth',2)
-plot(t,log10(y(:,2)),'Linewidth',2)
-xlabel('Time (days)')
-ylabel('Absolute Abundance')
-title('Climax and Attack Populations')
 legend('C model','F model','Location','e')
-
-% figure()
-% hold on; box on;
-% plot(t,y(:,3),'Linewidth',2)
-% xlabel('Time (days)')
-% ylabel('Oxygen (\muM)')
-% title('Oxygen')
 
 %%% Functions =============================================================
 

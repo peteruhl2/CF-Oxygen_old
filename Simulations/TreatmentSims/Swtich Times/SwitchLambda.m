@@ -100,6 +100,7 @@ hold on; box on;
 plot(lambdaFrac,results, 'LineWidth',2)
 xlabel('Oxygen inflow rate (% of normal)')
 ylabel('Days to population switch')
+title("Days to population switch as function of \lambda")
 
 figure()
 hold on; box on;

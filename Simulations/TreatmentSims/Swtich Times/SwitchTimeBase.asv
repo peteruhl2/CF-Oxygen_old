@@ -55,7 +55,7 @@ q = 3.2747e-5;
 frac = 0.8659;
 
 lambda = mu*x0;
-% lambda = 11.6901e+07;
+lambda = 11.6901e+07;
 
 p = [x0,frac,beta,r,...
      eta,dbs,dn,gamma,...
@@ -113,10 +113,10 @@ plot(t,Ft,'Linewidth',2)
 xlabel('Time (days)')
 ylabel('Relative Abundance')
 title('Climax and Attack Populations')
-xline(swtimes)
+% xline(t_b)
 % xline(t_c)
 % legend('C model','F model','C data','F data','Location','e')
-legend('C model','F model','Population switch','Location','e')
+legend('C model','F model','Location','e')
 
 figure()
 hold on; box on;

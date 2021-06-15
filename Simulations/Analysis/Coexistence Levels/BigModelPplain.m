@@ -15,18 +15,18 @@
 
 %%% Parameters ============================================================
 global k beta r d b mu eta lambda q n
-k = 10^11;
+k = 10^10;
 
 beta = 16.6;
-r = 16;
+r = 0.004;
 d = 0.6;
 b = 13.4;
-n = 3.6;
+n = 2.6;
 
 mu = 200*23*60*24;
-eta = 3.1e-4;
+eta = 3.1e-3;
 
-lambda = 9.2e7;
+lambda = 9.6e7;
 q = 3e-1;
 
 %%% =======================================================================
@@ -70,9 +70,9 @@ ylabel('F')
 scatter(c(end),f(end),'kx','Linewidth',4)
 
 %%% hard coded exclusion points
-scatter(0,0.7994,'rx','Linewidth',4)
-scatter(0.2863,0,'bx','Linewidth',4)
-legend('Cp = 0','Fp = 0','Coexistence equilibrium','F only equilibrium','C only equilibrium')
+scatter(0,0.3368,'rx','Linewidth',4)
+scatter(0.435,0,'bx','Linewidth',4)
+legend('Cp = 0','Fp = 0','Coexistence equilibrium (Stable)','F only equilibrium (Unstable)','C only equilibrium (Unstable)')
 
 
 

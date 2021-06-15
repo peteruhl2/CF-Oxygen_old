@@ -1,5 +1,5 @@
 %%% find the switch times for different ranges of parameters
-%%% this one for beta
+%%% this one for n
 %%% to get to 0.5 relative abundance
 
 % C' = (beta*x^n/(b^n + x^n))*c*(1 - (c + f)/k) - dc*c;
@@ -24,8 +24,8 @@ t_b = 19*0;
 t_c = 33*Inf;
 
 %%% =======================================================================
-Beta = linspace(0,30);
-results = zeros(length(Beta),1);
+N = linspace(0,10);
+results = zeros(length(N),1);
 
 %%% parameters
 %%% initial oxygen
@@ -53,8 +53,8 @@ frac = 0.8659;
 
 lambda = mu*x0;
 
-for i = 1:length(Beta)
-    beta = Beta(i);
+for i = 1:length(N)
+    n = N(i);
 
     p = [x0,frac,beta,r,...
          eta,dbs,dn,gamma,...
@@ -103,10 +103,10 @@ end
 
 figure()
 hold on; box on;
-plot(Beta,results, 'LineWidth',2)
-xlabel('\beta')
+plot(N,results, 'LineWidth',2)
+xlabel('Slope factor n')
 ylabel('Days to population switch')
-title('Days to population switch, 0 < \beta < 
+title('Days to population switch, 0 < n < 10')
 
 figure()
 hold on; box on;

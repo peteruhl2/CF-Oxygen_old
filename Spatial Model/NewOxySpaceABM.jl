@@ -310,19 +310,51 @@ while (true)
     ### this does the movie ===================================================#
     BS = "Broad-spectrum antibiotics"
     Clin = "Antibiotics targeting attack"
-    title = "No treatment"
+    time_string = string(round(t/36, digits = 2))
+    # default title
+    title = "No treatment, t = $time_string out of 40 days"
 
     # set title
     if t < t_b
-        title = BS
+        title = BS*", t = $time_string out of 40 days"
     end
     if t > t_c
-        title = Clin
+        title = Clin*", t = $time_string out of 40 days"
     end
     if t%1 == 0
         p = heatmap(D[:,:,1],title = title,legend=true,clims=(0,2))
         display(p)
     end
+
+
+    # ### this is for saving images for a gif ====================================#
+    #
+    # # just to save figures
+    # # for a gif 6/14/21
+    # # move to external drive
+    # cd("D:\\Figs")
+    #
+    # if (t-1) % 10 == 0
+    #     if t < 10
+    #         println("00000$t")
+    #         savefig("patch00000$t.png")
+    #     elseif t < 100
+    #         println("0000$t")
+    #         savefig("patch0000$t.png")
+    #     elseif t < 1000
+    #         println("000$t")
+    #         savefig("patch000$t.png")
+    #     elseif t < 10000
+    #         println("00$t")
+    #         savefig("patch00$t.png")
+    #     end
+    #     # println("$t")
+    #     # savefig("patch$t.png")
+    # end
+    #
+    # ### end of saving images ===================================================#
+
+
     ### end of movie stuff ====================================================#
 
 
