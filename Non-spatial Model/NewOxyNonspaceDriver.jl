@@ -264,8 +264,8 @@ function sim(num::Int64, movie::Bool=false)
 
         write(io, "$c $f $pop $w\n")
 
-        # end if one goes extint
-        if c == 0 || f == 0 break end
+        # # end if one goes extint, turned off to always get the full time range
+        # if c == 0 || f == 0 break end
 
     end # end timer
     end # end time loop
@@ -277,7 +277,7 @@ end
 function main()
     mkdir("Simulations")
 
-    runs = 10
+    runs = 100
 
     for i = 1:runs
         sim(i)

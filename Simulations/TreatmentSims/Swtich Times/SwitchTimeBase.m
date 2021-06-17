@@ -38,8 +38,8 @@ x0 = 14.6287;
 r = 0.0046;
 
 beta = 16.6388;
-b = 13.4256;
-n = 2.6626;
+b = 12.4256;
+n = 0.6626;
 
 dn = 0.6045; % natural death rate
 dbs = 6.7686; % death due to bs antibiotics
@@ -78,7 +78,7 @@ c0 = frac*N0;
 f0 = (1 - frac)*N0;
 
 y0 = [c0; f0; x0];
-tspan = [0:0.01:50];
+tspan = [0:0.01:100];
 [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
 %%% relative abundances

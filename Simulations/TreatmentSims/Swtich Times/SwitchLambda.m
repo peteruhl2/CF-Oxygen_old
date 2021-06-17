@@ -74,7 +74,7 @@ for i = 1:length(lambdaFrac)
     f0 = (1 - frac)*N0;
 
     y0 = [c0; f0; x0];
-    tspan = [0:0.01:40];
+    tspan = [0:0.01:150];
     [t, y] = ode15s(@(t,y) cf_eqs(t,y,p), tspan, y0);
 
     %%% relative abundances
