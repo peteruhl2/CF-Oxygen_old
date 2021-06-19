@@ -106,7 +106,7 @@ hold on; box on;
 plot(D,results, 'LineWidth',2)
 xlabel('Death rate d')
 ylabel('Days to population switch')
-title('Days to population switch, 0 < d < 10')
+title('Days to population switch based on antibiotic treatment')
 
 figure()
 hold on; box on;

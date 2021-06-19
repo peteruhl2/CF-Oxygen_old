@@ -6,6 +6,7 @@ cd(@__DIR__)
 
 # # for making a gif for VII meeting
 # cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\figs")
+cd("C:\\Users\\peter\\OneDrive\\Desktop\\Sims")
 
 using Plots, Statistics
 
@@ -14,13 +15,13 @@ using Plots, Statistics
 
 function get_rc(ox)
     global b
-    β = 16.64/36; n = 2.6626; rcmin = 0.0;
+    β = 26.64/36; n = 2.6626; rcmin = 0.0;
     return rc = β*ox.^n./(b^n .+ ox.^n) + rcmin
 end
 
 function get_rf(ox)
     global b
-    β = 16.64/36; n = 2.6626; rcmin = 0.0;
+    β = 26.64/36; n = 2.6626; rcmin = 0.0;
     return rc = β*(1 - ox.^n./(b^n .+ ox.^n)) + rcmin
 end
 
@@ -131,8 +132,8 @@ end
 
 #=============================================================================#
 # oxygen growth parameters
-b = 0.2
-q = 1.0
+b = 0.03
+q = 4.5
 
 # size of domain and initial values
 w = 0.1388 # initial oxygen
@@ -143,13 +144,13 @@ D[:,:,2] .= w
 
 # time stuff
 t = 0
-tmax = 200*Inf
+tmax = 1000
 t_treat = 24*28
 
 # ode stuff
-λ = 0.22/24; μ = 1.4273/24; Cyn = 0.; neigh = 0; X = 0;
-η = 1.0
-g = 1.3 # diffustion rate
+λ = 0.42/24; μ = 1.0273/24; Cyn = 0.; neigh = 0; X = 0;
+η = 22.0
+g = 1.2 # diffustion rate
 
 fx(x,X) = λ - μ*x - η*Cyn*x - g*neigh*x + g*X
 step = 0.05 # as large as possible w/o blowing up the ode
@@ -168,8 +169,8 @@ P = [] # total population
 ox = []
 
 # initial amounts of c and f
-c1 = ceil(0.8283*length(D[:,:,1]))
-f1 = ceil(0.165*length(D[:,:,1]))
+c1 = ceil(0.1283*length(D[:,:,1]))
+f1 = ceil(0.05*length(D[:,:,1]))
 
 #populate for f1
 f0 = 0
@@ -247,7 +248,7 @@ while (true)
 
         # get death rates
         dc = get_dc(t)
-        df = get_df(t,w)
+        # df = get_df(t,w)
 
         # if sampled spot is c
         if D[idim,jdim,1] == 1
@@ -269,7 +270,8 @@ while (true)
         if D[idim,jdim,1] == 2
             samp += 1 # increment samp
             rn = rand(); # get random number
-            rf = get_rf(w) # get oxygen dependent growth rate
+            rf = get_rf(D[idim,jdim,2]) # get oxygen dependent growth rate
+            df = get_df(t,D[idim,jdim,2]) # need to get the death rate too
 
             # division event for f
             if rn < rf
@@ -295,14 +297,15 @@ while (true)
     # this does the movie
     if t%1 == 0
         p1 = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
-        p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true) #,clims=(0.05,maximum(D[:,:,2])))
+        # p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true) #,clims=(0.05,maximum(D[:,:,2])))
+        p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(0.0,0.1))
         p = plot(p1,p2,layout = (1,2),legend=true)
         display(p)
     end
 
     # # just to save figures
-    # # for a gif 1/13/21
-    # if (t-1) % 100 == 0
+    # # for a gif 1/13/21 and 6/18/21
+    # if (t-1) % 1 == 0
     #     if t < 10
     #         println("00000$t")
     #         savefig("patch00000$t.png")
