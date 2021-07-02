@@ -78,6 +78,10 @@ function sim(num::Int64, movie::Bool=false)
     w = 14.63
 
     # size of domain
+    keta = 3.16e6
+    k = 100^2
+    η = keta/k
+
     n = convert(Int64,floor(sqrt(k)))
     D = zeros(n,n,2)
     D[:,:,2] .= w
@@ -87,7 +91,7 @@ function sim(num::Int64, movie::Bool=false)
 
     # ode parameters
     # λ = 0.22/24; μ = 1.4273/24; η = (0.8176/24)/n^2; C_tot = 0.;
-    λ = 9.690912e7/36; μ = 6624000/36; η = (3.16e2/36); C_tot = 0.;
+    λ = 9.690912e7/36; μ = 6624000/36; η = (η/36); C_tot = 0.;
     p = [λ,μ,η,C_tot]
 
     # treatment parameter(s)
@@ -277,7 +281,7 @@ end
 function main()
     mkdir("Simulations")
 
-    runs = 100
+    runs = 500
 
     for i = 1:runs
         sim(i)

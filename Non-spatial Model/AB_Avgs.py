@@ -18,7 +18,7 @@ import pandas as pd
 path = r'C:\Users\peter\OneDrive\Documents\GitHub\CF-Oxygen\Non-spatial Model\Simulations'
 os.chdir(path)
 
-n_sims = 1000
+n_sims = 500
 t_steps = 1440
 
 C = np.zeros((t_steps,n_sims))
@@ -40,9 +40,13 @@ for i in range(1,n_sims + 1):
     sim = pd.read_csv(file_name, delimiter=' ', header=None)
     sim = np.asarray(sim)
     
+    # # copy to C and F arrays
+    # C[:,i-1] = sim[:,0]
+    # F[:,i-1] = sim[:,1]
+    
     # copy to C and F arrays
-    C[:,i-1] = sim[:,0]
-    F[:,i-1] = sim[:,1]
+    C[:,i-1] = sim[:,0]/sim[:,3]
+    F[:,i-1] = sim[:,1]/sim[:,3]
     
     # replace 0's in F with nan
     C[F == 0] = np.nan
@@ -67,7 +71,4 @@ with open('AB_avgs.csv', 'w') as f:
     
         # comment this if things don't work
         f.write('%d,%d,%d,%d,%d,%d\n' % (C_25[i],C_avg[i],C_975[i],F_25[i],F_avg[i],F_975[i]))
-    
-
-
-    
+            
