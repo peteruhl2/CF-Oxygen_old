@@ -137,7 +137,7 @@ q = 4.5
 
 # size of domain and initial values
 w = 0.0388 # initial oxygen
-k = 80^2 # carrying capacity
+k = 40^2 # carrying capacity
 n = convert(Int64,floor(sqrt(k)))
 D = zeros(n,n,2)
 D[:,:,2] .= w

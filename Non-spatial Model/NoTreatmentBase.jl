@@ -71,11 +71,11 @@ P = [] # total population
 ox = []
 
 ### initial amounts of c and f
-# c1 = ceil(0.8283*length(D[:,:,1]))
-# f1 = ceil(0.165*length(D[:,:,1]))
+c1 = ceil(0.0683*length(D[:,:,1]))
+f1 = ceil(0.05*length(D[:,:,1]))
 ### hard coded initial conditions from ode
-c1 = 580.0
-f1 = 91.0
+# c1 = 580.0
+# f1 = 91.0
 
 #populate for f1
 f0 = 0
@@ -235,8 +235,8 @@ end # end time loop
 # # End ABM debugging ===========================================================#
 # # =============================================================================#
 
-p1 = plot((C./P)[C.>0],label = "C ABM", lw = 2)
-p1 = plot!((F./P)[F.>0],label = "F ABM", lw = 2)
+p1 = plot((C)[C.>0],label = "C ABM", lw = 2)
+p1 = plot!((F)[F.>0],label = "F ABM", lw = 2)
 p2 = plot(ox)
 p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (hours)")
 display(p)

@@ -5,70 +5,33 @@
 cd(@__DIR__)
 
 # # for making a gif for VII meeting
-# cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\figs")
-cd("C:\\Users\\peter\\OneDrive\\Desktop\\Sims")
+# cd("C:\\Users\\peter\\OneDrive\\Desktop\\Sims")
 
-using Plots, Statistics
+using Plots, Statistics, DifferentialEquations
 
 # Rate functions ===============================================================
 # ===============================================================================
 
-function get_rc(ox)
-    global b
-    β = 26.64/36; n = 2.6626; rcmin = 0.0;
-    return rc = β*ox.^n./(b^n .+ ox.^n) + rcmin
+function get_rc(ox,p)
+    β,b,n_param,rcmin,dn,q = p
+    return rc = β*ox.^n_param./(b^n_param .+ ox.^n_param) + rcmin
 end
 
-function get_rf(ox)
-    global b
-    β = 26.64/36; n = 2.6626; rcmin = 0.0;
-    return rc = β*(1 - ox.^n./(b^n .+ ox.^n)) + rcmin
+function get_rf(ox,p)
+    β,b,n_param,rcmin,dn,q = p
+    return rf = β*(1 - ox.^n_param./(b^n_param .+ ox.^n_param))
 end
 
-function get_dc(t)
-    t_b = 19*36; dn = 0.6045/36; dbs = 6.7686/36
-
-    # if t < t_b
-    #     return dn + dbs
-    # else
-    #     return dn
-    # end
-
+function get_dc(t,p)
+    β,b,n_param,rcmin,dn,q = p
     return dn
 end
 
-function get_df(t,w)
-    global q
-    t_b = 19*36; t_c = 33*36; γ = 0.8976; dn = 0.6045/36
-    dbs = 6.7686/36; ϵ = 1.21/36
-    # q = 1.2;
+function get_df(t,w,p)
+    β,b,n_param,rcmin,dn,q = p
 
-    # base rate
-    df = dn + q*w
-
-    # # broad spectrum rate
-    # if t < t_b
-    #     df += γ*dbs
-    # end
-    #
-    # # clindamycin rate
-    # if t > t_c
-    #     df += ϵ
-    # end
-
-    return df
+    return dn + q*w
 end
-
-# broad spectrum antibiotic function
-function BrSpec(t,p)
-    global t_b
-    if t < t_b
-        return p[5];
-    else
-        return 0.;
-    end
-end
-
 
 # ABM functions ================================================================
 # ==============================================================================
@@ -131,36 +94,49 @@ function get_neigh(D,i,j,n)
 end
 
 #=============================================================================#
-# oxygen growth parameters
-b = 0.03
-q = 4.5
-
-# size of domain and initial values
-w = 0.0388 # initial oxygen
-k = 80^2 # carrying capacity
+# size of domain =============================================================#
+k = 40.0^2
 n = convert(Int64,floor(sqrt(k)))
 D = zeros(n,n,2)
+
+# parameters
+β = 16.64/36
+b = 13.64
+n_param = 2.66
+rcmin = 0.0
+dn = 0.6045/36
+q = 3.27e-5/36
+λ = 9.7e7/36
+μ = 6.62e6/36
+g = 0.0 # diffustion rate
+Cyn = 0. # C in the spot?
+neigh = 0. # number of neighbors
+X = 0. # total amount of oxygen in neighbors
+
+# best fitting value of k*η
+keta = 3.16e6
+# η = keta/k
+η = 3.16e6/36
+
+p_ = [β,b,n_param,rcmin,dn,q,λ,μ,η,g,Cyn,neigh,X]
+
+
+# initial oxygen
+w = 14.6
 D[:,:,2] .= w
 
 # time stuff
 t = 0
-tmax = 1000
-t_treat = 24*28
+tmax = 100
 
-# ode stuff
-λ = 0.42/24; μ = 1.0273/24; Cyn = 0.; neigh = 0; X = 0;
-η = 22.0
-g = 1.2 # diffustion rate
+### Oxygen ode ================================================================#
+# fx(x,X,p,t) = λ - μ*x - η*Cyn*x - g*neigh*x + g*X
+# fx(x,p,t) = p[7] - p[8]*x - p[9]*p[11]*x - p[10]*p[12]*x + p[10]*p[13]
 
-fx(x,X) = λ - μ*x - η*Cyn*x - g*neigh*x + g*X
-step = 0.05 # as large as possible w/o blowing up the ode
+p_ox = [λ,μ,η,Cyn,g,neigh,X]
+fx(x,p,t) = p[1] - p[2]*x - p[3]*p[4]*x - p[5]*p[6]*x + p[5]*p[7]
 
-# death rates constant
-dc = 0.7016/24
-df = 0.7016/24
-
-# treatment parameter
-ϵ = 0.5428/24
+### ===========================================================================#
 
 # results arrays (temp)
 C = []
@@ -201,43 +177,52 @@ append!(F,f1)
 append!(P,pop)
 append!(ox,w)
 
+t = 0
 # time loop
 @time begin
 while (true)
-    samp = 0; global pop; global t; global tmax
+    samp = 0; global pop; global t; global tmax; global p_ox
     t += 1
     if t > tmax break end
     println("$t out of ",tmax)
 
-    global step; t2 = 0
-    while (t2*step <= 1) # will be ode loop
-        t2 += 1
-
-        for i = 1:n # loop over cell array
-            for j = 1:n
-                # global Cyn = D[i,j,1]
-                if D[i,j,1] == 1
-                    global Cyn = 1
-                else global Cyn = 0
-                end
-
-                stuff = get_neigh(D,i,j,n)
-                global X = stuff[1]
-                global neigh = stuff[2]
-                # X,neigh = get_neigh(D,i,j,n)
-
-                xij = D[i,j,2]
-                k1 = fx(xij,X)
-                k2 = fx(xij + 0.5*step*k1,X)
-                k3 = fx(xij + 0.5*step*k2,X)
-                k4 = fx(xij + step*k3,X)
-                D[i,j,2] = xij + (step/6)*(k1 + 2*k2 + 2*k3 + k4)
-
-                # println("ode is at: ", t2*step)
+    for i = 1:n # loop over cell array
+        for j = 1:n
+            # global Cyn = D[i,j,1]
+            if D[i,j,1] == 1
+                global Cyn = 1
+            else global Cyn = 0
             end
-        end # loop over cell array
 
-    end # end ode loop
+            global p_ox
+            stuff = get_neigh(D,i,j,n)
+            global X = stuff[1]
+            global neigh = stuff[2]
+            # X,neigh = get_neigh(D,i,j,n)
+
+            p_ox[4] = Cyn
+            p_ox[6] = neigh
+            p_ox[7] = X
+
+            tspan = (0.0,1.0)
+            u0 = D[i,j,2]
+            prob = ODEProblem(fx,u0,tspan,p_ox)
+            sol = solve(prob)
+            D[i,j,2] = sol.u[end]
+
+            # display(p_ox)
+
+            # xij = D[i,j,2]
+            # k1 = fx(xij,X)
+            # k2 = fx(xij + 0.5*step*k1,X)
+            # k3 = fx(xij + 0.5*step*k2,X)
+            # k4 = fx(xij + step*k3,X)
+            # D[i,j,2] = xij + (step/6)*(k1 + 2*k2 + 2*k3 + k4)
+
+            # println("ode is at: ", t2*step)
+        end
+    end # loop over cell array
+
 
 
     # agent based loop
@@ -247,14 +232,16 @@ while (true)
         jdim = rand(1:n)
 
         # get death rates
-        dc = get_dc(t)
+        # dc = get_dc(t)
         # df = get_df(t,w)
 
         # if sampled spot is c
         if D[idim,jdim,1] == 1
             samp += 1 #increment sample
             rn = rand() # get random number
-            rc = get_rc(D[idim,jdim,2])
+            rc = get_rc(D[idim,jdim,2],p_)
+            dc = get_dc(t,p_)
+            # println("rc = ",rc)
 
             # division event for c
             if rn < rc
@@ -270,8 +257,8 @@ while (true)
         if D[idim,jdim,1] == 2
             samp += 1 # increment samp
             rn = rand(); # get random number
-            rf = get_rf(D[idim,jdim,2]) # get oxygen dependent growth rate
-            df = get_df(t,D[idim,jdim,2]) # need to get the death rate too
+            rf = get_rf(D[idim,jdim,2],p_) # get oxygen dependent growth rate
+            df = get_df(t,D[idim,jdim,2],p_) # need to get the death rate too
 
             # division event for f
             if rn < rf
@@ -297,8 +284,8 @@ while (true)
     # this does the movie
     if t%1 == 0
         p1 = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
-        # p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true) #,clims=(0.05,maximum(D[:,:,2])))
-        p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(0.0,0.1))
+        p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(0.05, maximum(D[:,:,2])))
+        # p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(5.0,15))
         p = plot(p1,p2,layout = (1,2),legend=true)
         display(p)
     end
@@ -331,14 +318,14 @@ while (true)
     append!(ox,mean(D[:,:,2]))
 
     # end if one goes extint
-    # if c == 0 || f == 0 break end
+    if c == 0 || f == 0 break end
 
 end # end timer
 end # end time loop
 
 
-p1 = plot((C./n^2)[C.>0],label = "C ABM", lw = 2)
-p1 = plot!((F./n^2)[F.>0],label = "F ABM", lw = 2)
+p1 = plot((C)[C.>0],label = "C ABM", lw = 2)
+p1 = plot!((F)[F.>0],label = "F ABM", lw = 2)
 p2 = plot(ox)
 p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (hours)")
 display(p)

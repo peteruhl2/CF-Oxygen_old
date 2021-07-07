@@ -40,13 +40,13 @@ for i in range(1,n_sims + 1):
     sim = pd.read_csv(file_name, delimiter=' ', header=None)
     sim = np.asarray(sim)
     
-    # # copy to C and F arrays
-    # C[:,i-1] = sim[:,0]
-    # F[:,i-1] = sim[:,1]
+    # # aboslute numbers copy to C and F arrays
+    C[:,i-1] = sim[:,0]
+    F[:,i-1] = sim[:,1]
     
-    # copy to C and F arrays
-    C[:,i-1] = sim[:,0]/sim[:,3]
-    F[:,i-1] = sim[:,1]/sim[:,3]
+    # # copy relative numbers to C and F arrays
+    # C[:,i-1] = sim[:,0]/sim[:,3]
+    # F[:,i-1] = sim[:,1]/sim[:,3]
     
     # replace 0's in F with nan
     C[F == 0] = np.nan
