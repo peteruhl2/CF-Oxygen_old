@@ -144,7 +144,7 @@ D[:,:,2] .= w
 
 # time stuff
 t = 0
-tmax = 1000
+tmax = 100
 t_treat = 24*28
 
 # ode stuff

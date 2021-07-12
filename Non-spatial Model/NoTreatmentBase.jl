@@ -235,8 +235,22 @@ end # end time loop
 # # End ABM debugging ===========================================================#
 # # =============================================================================#
 
+# absolute
 p1 = plot((C)[C.>0],label = "C ABM", lw = 2)
 p1 = plot!((F)[F.>0],label = "F ABM", lw = 2)
 p2 = plot(ox)
-p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (hours)")
+p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (days)")
+p = plot!(xticks = (0:180:1440, ["0","5","10","15","20","25","30","35","40"]))
+display(p)
+
+# relative
+p1 = plot((C./P)[C.>0],label = "C ABM", lw = 2)
+p1 = plot!((F./P)[F.>0],label = "F ABM", lw = 2)
+# p2 = plot(ox)
+# p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (hours)")
+p = plot!(xticks = (0:180:1440, ["0","5","10","15","20","25","30","35","40"]))
+p = plot!(legend=:right)
+p = plot!(xlabel = "Time (days)")
+p = plot!(ylabel = "Relative Abundance")
+p = plot!(title = "Spatially homogeneous model")
 display(p)

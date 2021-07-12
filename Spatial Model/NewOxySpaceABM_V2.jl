@@ -95,7 +95,7 @@ end
 
 #=============================================================================#
 # size of domain =============================================================#
-k = 40.0^2
+k = 100.0^2
 n = convert(Int64,floor(sqrt(k)))
 D = zeros(n,n,2)
 
@@ -127,7 +127,7 @@ D[:,:,2] .= w
 
 # time stuff
 t = 0
-tmax = 100
+tmax = 40*36
 
 ### Oxygen ode ================================================================#
 # fx(x,X,p,t) = λ - μ*x - η*Cyn*x - g*neigh*x + g*X
@@ -324,10 +324,23 @@ end # end timer
 end # end time loop
 
 
+# absolute
 p1 = plot((C)[C.>0],label = "C ABM", lw = 2)
 p1 = plot!((F)[F.>0],label = "F ABM", lw = 2)
 p2 = plot(ox)
-p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (hours)")
+p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (days)")
+p = plot!(xticks = (0:180:1440, ["0","5","10","15","20","25","30","35","40"]))
 display(p)
 
-# println(C[end]," ",F[end])
+# relative
+p1 = plot((C./P)[C.>0],label = "C ABM", lw = 2)
+p1 = plot!((F./P)[F.>0],label = "F ABM", lw = 2)
+# p2 = plot(ox)
+# p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (hours)")
+p = plot!(xticks = (0:180:1440, ["0","5","10","15","20","25","30","35","40"]))
+p = plot!(legend=:right)
+p = plot!(xlabel = "Time (days)")
+p = plot!(ylabel = "Relative Abundance")
+p = plot!(title = "Spatially dependent model")
+
+display(p)
