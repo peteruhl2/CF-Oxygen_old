@@ -31,7 +31,7 @@ for i = 1:length(lambdaFrac)
     x0 = 14.6287;
 
     % parameters
-    r = 0.0046;
+    r = 0.0046*0;
 
     beta = 16.6388;
     b = 13.4256;

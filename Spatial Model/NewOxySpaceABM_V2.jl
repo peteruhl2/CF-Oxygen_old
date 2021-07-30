@@ -127,7 +127,7 @@ D[:,:,2] .= w
 
 # time stuff
 t = 0
-tmax = 40*36
+tmax = 50*36
 
 ### Oxygen ode ================================================================#
 # fx(x,X,p,t) = λ - μ*x - η*Cyn*x - g*neigh*x + g*X
@@ -145,8 +145,8 @@ P = [] # total population
 ox = []
 
 # initial amounts of c and f
-c1 = ceil(0.0683*length(D[:,:,1]))
-f1 = ceil(0.05*length(D[:,:,1]))
+c1 = ceil(2*0.0590*length(D[:,:,1]))
+f1 = ceil(0.008*length(D[:,:,1]))
 
 #populate for f1
 f0 = 0
@@ -281,14 +281,14 @@ while (true)
         if D[j] == 2 f += 1 end
     end
 
-    # this does the movie
-    if t%1 == 0
-        p1 = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
-        p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(0.05, maximum(D[:,:,2])))
-        # p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(5.0,15))
-        p = plot(p1,p2,layout = (1,2),legend=true)
-        display(p)
-    end
+    # # this does the movie
+    # if t%1 == 0
+    #     p1 = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
+    #     p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(0.05, maximum(D[:,:,2])))
+    #     # p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(5.0,15))
+    #     p = plot(p1,p2,layout = (1,2),legend=true)
+    #     display(p)
+    # end
 
     # # just to save figures
     # # for a gif 1/13/21 and 6/18/21
@@ -337,10 +337,18 @@ p1 = plot((C./P)[C.>0],label = "C ABM", lw = 2)
 p1 = plot!((F./P)[F.>0],label = "F ABM", lw = 2)
 # p2 = plot(ox)
 # p = plot(p1,p2,layout = (2,1),legend=false, xlabel = "t (hours)")
-p = plot!(xticks = (0:180:1440, ["0","5","10","15","20","25","30","35","40"]))
+p = plot!(xticks = (0:180:1800, ["0","5","10","15","20","25","30","35","40","45","50"]))
 p = plot!(legend=:right)
 p = plot!(xlabel = "Time (days)")
 p = plot!(ylabel = "Relative Abundance")
 p = plot!(title = "Spatially dependent model")
+p = plot!(ylims = (0,1))
 
 display(p)
+
+# find crossing point
+tol = 10
+switchpt = findall(abs.(C.-F).<10)
+switchpt = switchpt[1]
+
+vline!([switchpt[1]],linecolor=:black, label = "Population switch")
