@@ -98,7 +98,7 @@ end
 
 
 # Main funciton ===============================================================#
-function ABM_switch(frac = 1.0)
+function ABM_switch(frac, id)
     # size of domain ==========================================================#
     k = 40.0^2
     n = convert(Int64,floor(sqrt(k)))
@@ -132,7 +132,7 @@ function ABM_switch(frac = 1.0)
 
     # time stuff
     t = 0
-    tmax = 50*36
+    tmax = 50*36*Inf
 
     ### Oxygen ode ================================================================#
     # fx(x,X,p,t) = λ - μ*x - η*Cyn*x - g*neigh*x + g*X
@@ -192,7 +192,7 @@ function ABM_switch(frac = 1.0)
 
         # check the time now and then
         if t%100 == 0
-            println("$t out of ",tmax)
+            println("Thread$id, $t out of ",tmax)
         end
 
         for i = 1:n # loop over cell array
@@ -290,14 +290,14 @@ function ABM_switch(frac = 1.0)
             if D[j] == 2 f += 1 end
         end
 
-        # # this does the movie
-        # if t%1 == 0
-        #     p1 = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
-        #     p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(0.05, maximum(D[:,:,2])))
-        #     # p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(5.0,15))
-        #     p = plot(p1,p2,layout = (1,2),legend=true)
-        #     display(p)
-        # end
+        # this does the movie
+        if t%1 == 0
+            p1 = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
+            p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(0.05, maximum(D[:,:,2])))
+            # p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(5.0,15))
+            p = plot(p1,p2,layout = (1,2),legend=true)
+            display(p)
+        end
 
         # # just to save figures
         # # for a gif 1/13/21 and 6/18/21
@@ -369,17 +369,29 @@ end # end ABM_switch
 # go to simulations folder
 cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\Spatial Simulations")
 
-n_sims = 100
-Fracs = 0.9
+n_sims = 1
+Fracs = 0.5
+
+# keep track of sims run
+sims_run = []
 
 io = open("frac = $Fracs.csv", "w")
 
 @time begin
-Threads.@threads for i = 1:n_sims
+# Threads.@threads for i = 1:n_sims
+for i = 1:n_sims
 
-    println("lambda frac = ", Fracs, " Simulation ",i)
+    # add i to list when it runs
+    if i ∉ sims_run
+        append!(sims_run,i)
+    end
 
-    t = ABM_switch(Fracs)
+    # which simulations its on and how many remaining
+    println("Thread number ", Threads.threadid(), " lambda frac = ", Fracs, " Simulation ",i)
+    println("Remaining: ", n_sims - length(sims_run))
+
+    # write switch time to file
+    t = ABM_switch(Fracs,Threads.threadid())
     write(io, "$t\n")
 end
 end # end timer
