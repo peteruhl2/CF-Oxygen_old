@@ -228,6 +228,7 @@ while (true)
 
     # end if one goes extint
     if c == 0 || f == 0 break end
+    if f > c break end
 
 end # end timer
 end # end time loop

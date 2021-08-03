@@ -9,7 +9,7 @@
 
 %%% 4/26/2020
 
-close all;
+% close all;
 
 data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
 tdata = data(:,1);

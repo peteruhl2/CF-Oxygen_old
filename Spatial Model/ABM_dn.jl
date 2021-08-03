@@ -1,6 +1,6 @@
-# this will do a bunch of simulations with variable values for lambda
+# this will do a bunch of simulations with variable values for dn
 # for each run, the switch time gets written to a csv file
-# July 30, 2021
+# Aug 1, 2021
 
 # get to home directory
 cd(@__DIR__)
@@ -95,7 +95,7 @@ function get_neigh(D,i,j,n)
 end
 
 
-function main(frac,id)
+function main(death,id)
 
     display("Starting run on Thread$id")
     #=============================================================================#
@@ -109,9 +109,9 @@ function main(frac,id)
     b = 13.64
     n_param = 2.66
     rcmin = 0.0
-    dn = 0.6045/36
+    dn = death/36
     q = 3.27e-5/36
-    λ = 9.7e7/36*frac
+    λ = 9.7e7/36
     μ = 6.62e6/36
     g = 0.0 # diffustion rate
     Cyn = 0. # C in the spot?
@@ -379,12 +379,12 @@ end # main
 cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\Spatial Simulations")
 
 n_sims = 100
-frac = 0.5
+death = 0.5
 
 # keep track of sims run
 sims_run = []
 
-io = open("frac = $frac.csv", "w")
+io = open("dn = $death.csv", "w")
 
 @time begin
 Threads.@threads for i = 1:n_sims
@@ -396,11 +396,11 @@ Threads.@threads for i = 1:n_sims
     end
 
     # which simulations its on and how many remaining
-    println("Thread number ", Threads.threadid(), " lambda frac = ", frac, " Simulation ",i)
+    println("Thread number ", Threads.threadid(), " dn = ", death, " Simulation ",i)
     println("Remaining: ", n_sims - length(sims_run))
 
     # write switch time to file
-    t = main(frac,Threads.threadid())
+    t = main(death,Threads.threadid())
     write(io, "$t\n")
 end
 end # end timer
