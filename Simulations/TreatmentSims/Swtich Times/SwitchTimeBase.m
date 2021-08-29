@@ -11,12 +11,12 @@
 
 % close all;
 
-data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
-tdata = data(:,1);
-% cdata = data(:,2)/100;
-% fdata = data(:,3)/100;
-cdata = data(:,2);
-fdata = data(:,3);
+% data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
+% tdata = data(:,1);
+% % cdata = data(:,2)/100;
+% % fdata = data(:,3)/100;
+% cdata = data(:,2);
+% fdata = data(:,3);
 
 %%% =======================================================================
 

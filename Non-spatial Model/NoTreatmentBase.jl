@@ -204,7 +204,8 @@ while (true)
     # BS = "Broad-spectrum antibiotics"
     # Clin = "Antibiotics targeting attack"
     # title = "No treatment"
-    #
+    # t_b = 19*36; t_c = 33*36;
+    
     # # set title
     # if t < t_b
     #     title = BS
@@ -213,7 +214,7 @@ while (true)
     #     title = Clin
     # end
     # if t%1 == 0
-    #     p = heatmap(D[:,:,1],title = title,legend=true,clims=(0,2))
+    #     p = heatmap(D[:,:,1],title = title*" $t",legend=true,clims=(0,2))
     #     display(p)
     # end
     # ### end of movie stuff ====================================================#
