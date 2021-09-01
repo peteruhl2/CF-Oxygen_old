@@ -376,10 +376,11 @@ end # main
 
 
 # go to simulations folder
-cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\Spatial Simulations")
+# cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\Spatial Simulations") # PC directory 
+cd("/Users/peteruhl/Documents/GitHub/CF-Oxygen/Spatial Model/Spatial Simulations") # mac directory
 
 n_sims = 100
-death = 0.5
+death = 9.0
 
 # keep track of sims run
 sims_run = []
