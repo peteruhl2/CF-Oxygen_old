@@ -281,14 +281,14 @@ while (true)
         if D[j] == 2 f += 1 end
     end
 
-    # # this does the movie
-    # if t%1 == 0
-    #     p1 = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
-    #     p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(0.05, maximum(D[:,:,2])))
-    #     # p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(5.0,15))
-    #     p = plot(p1,p2,layout = (1,2),legend=true)
-    #     display(p)
-    # end
+    # this does the movie
+    if t%1 == 0
+        p1 = heatmap(D[:,:,1],title = "Cells",legend=true,clims=(0,2))
+        p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(0.05, maximum(D[:,:,2])))
+        # p2 = heatmap(D[:,:,2],title = "Oxygen",legend=true, clims=(5.0,15))
+        p = plot(p1,p2,layout = (1,2),legend=true)
+        display(p)
+    end
 
     # # just to save figures
     # # for a gif 1/13/21 and 6/18/21

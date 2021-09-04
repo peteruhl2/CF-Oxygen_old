@@ -313,7 +313,10 @@ while (true)
     # BS = "Broad-spectrum antibiotics"
     # Clin = "Antibiotics targeting attack"
     # title = "No treatment"
-    #
+
+    # t_b = 19*36
+    # t_c = 33*36
+    
     # # set title
     # if t < t_b
     #     title = BS

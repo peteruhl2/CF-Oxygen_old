@@ -3,7 +3,8 @@
 
 close all;
 
-data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
+% data = xlsread('C:\Users\peter\OneDrive\Desktop\cyst fib\julia stuff\ODEs\Data fitting\cf data','Rescaled');
+data = xlsread('/Users/peteruhl/OneDrive/Desktop/cyst fib/julia stuff/ODEs/Data fitting/cf data.xlsx','Rescaled');
 tdata = data(:,1);
 % cdata = data(:,2)/100;
 % fdata = data(:,3)/100;
@@ -90,7 +91,7 @@ plot(tdata,cdata,'bx', 'LineWidth',2)
 plot(tdata,fdata,'rx', 'LineWidth',2)
 xlabel('Time (days)')
 ylabel('Relative Abundance')
-title('Climax and Attack Populations')
+% title('Climax and Attack Populations')
 % xline(t_b)
 % xline(t_c)
 legend('C model','F model','C data','F data','Location','w')

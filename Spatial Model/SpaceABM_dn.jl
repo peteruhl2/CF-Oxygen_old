@@ -100,7 +100,7 @@ function main(death,id)
     display("Starting run on Thread$id")
     #=============================================================================#
     # size of domain =============================================================#
-    k = 40.0^2
+    k = 100.0^2
     n = convert(Int64,floor(sqrt(k)))
     D = zeros(n,n,2)
 
@@ -379,8 +379,8 @@ end # main
 # cd("C:\\Users\\peter\\OneDrive\\Documents\\GitHub\\CF-Oxygen\\Spatial Model\\Spatial Simulations") # PC directory 
 cd("/Users/peteruhl/Documents/GitHub/CF-Oxygen/Spatial Model/Spatial Simulations") # mac directory
 
-n_sims = 100
-death = 9.0
+n_sims = 500
+death = 7.0
 
 # keep track of sims run
 sims_run = []

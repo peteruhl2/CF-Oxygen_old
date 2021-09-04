@@ -263,3 +263,4 @@ tol = 10
 switchpt = findall(abs.(C.-F).<20)
 
 vline!([switchpt],linecolor=:black, label = "Population switch")
+plot!(legend=:bottomright)
