@@ -15,7 +15,7 @@ fdata = data(:,3);
 
 % fixed parameters
 global k lambda t_b t_c N0 mu
- 
+
 N0 = 6.7e8;
 t_b = 19;
 t_c = 33;
